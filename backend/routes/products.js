@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 // @access  Private (Producteur seulement)
 router.get('/my-products', auth, requireRole(['PRODUCER']), async (req, res) => {
   try {
-    const products = await Product.find({ producerId: req.user._id })
+    const products = await Product.find({ producerId: req.user._id, isActive: true })
       .sort({ createdAt: -1 });
 
     res.json(products);

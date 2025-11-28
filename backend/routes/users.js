@@ -130,5 +130,112 @@ router.post('/profile-image', auth, upload.single('profileImage'), async (req, r
   }
 });
 
+// @route   DELETE /api/users/:id
+// @desc    Supprimer un utilisateur (Admin seulement)
+// @access  Private
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const currentUser = req.user;
+
+    // Vérifier si l'utilisateur existe
+    const userToDelete = await User.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    // Seul l'utilisateur lui-même ou un admin peut supprimer
+    if (currentUser._id.toString() !== userId && currentUser.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Accès non autorisé' });
+    }
+
+    // Compter les données liées
+    const Product = require('../models/Product');
+    const Order = require('../models/Order');
+    
+    const productCount = await Product.countDocuments({ producerId: userId });
+    const orderCount = await Order.countDocuments({ 
+      $or: [{ producerId: userId }, { merchantId: userId }] 
+    });
+
+    // Si l'utilisateur a des données liées, on ne peut pas le supprimer
+    if (productCount > 0 || orderCount > 0) {
+      return res.status(400).json({ 
+        message: 'Impossible de supprimer cet utilisateur car il a des données liées',
+        data: {
+          products: productCount,
+          orders: orderCount
+        }
+      });
+    }
+
+    // Supprimer l'utilisateur
+    await User.findByIdAndDelete(userId);
+
+    res.json({ 
+      message: 'Utilisateur supprimé avec succès',
+      deletedUser: {
+        id: userToDelete._id,
+        name: `${userToDelete.firstName} ${userToDelete.lastName}`,
+        email: userToDelete.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la suppression' });
+  }
+});
+
+// @route   DELETE /api/users/:id/force
+// @desc    Supprimer un utilisateur et toutes ses données liées (Admin seulement)
+// @access  Private
+router.delete('/:id/force', auth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const currentUser = req.user;
+
+    // Seul un admin peut faire une suppression forcée
+    if (currentUser.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Accès non autorisé - Admin requis' });
+    }
+
+    // Vérifier si l'utilisateur existe
+    const userToDelete = await User.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    const Product = require('../models/Product');
+    const Order = require('../models/Order');
+
+    // Supprimer les données liées
+    const deletedProducts = await Product.deleteMany({ producerId: userId });
+    const deletedOrders = await Order.deleteMany({ 
+      $or: [{ producerId: userId }, { merchantId: userId }] 
+    });
+
+    // Supprimer l'utilisateur
+    await User.findByIdAndDelete(userId);
+
+    res.json({ 
+      message: 'Utilisateur et toutes ses données supprimés avec succès',
+      deletedData: {
+        user: {
+          id: userToDelete._id,
+          name: `${userToDelete.firstName} ${userToDelete.lastName}`,
+          email: userToDelete.email
+        },
+        products: deletedProducts.deletedCount,
+        orders: deletedOrders.deletedCount
+      }
+    });
+
+  } catch (error) {
+    console.error('Erreur lors de la suppression forcée:', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la suppression forcée' });
+  }
+});
+
 module.exports = router;
 

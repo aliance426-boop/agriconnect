@@ -30,3 +30,10 @@ echo "3. Connecter le repo à Railway (backend)"
 echo "4. Configurer les variables d'environnement"
 echo ""
 echo "📖 Consultez deployment-guide.md pour les instructions détaillées"
+
+
+
+
+
+
+

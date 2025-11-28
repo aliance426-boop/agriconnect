@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const config = require('./config');
 
 const connectDB = require('./config/database');
 
@@ -57,7 +57,7 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route non trouvée' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = config.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Serveur AgriConnect démarré sur le port ${PORT}`);

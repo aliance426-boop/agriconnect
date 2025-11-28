@@ -42,3 +42,10 @@ const StockIndicator = ({ quantity, className = "" }) => {
 };
 
 export default StockIndicator;
+
+
+
+
+
+
+

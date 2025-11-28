@@ -34,3 +34,10 @@ const ActiveFilters = ({ filters, onRemoveFilter, onClearAll }) => {
 };
 
 export default ActiveFilters;
+
+
+
+
+
+
+

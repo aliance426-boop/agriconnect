@@ -108,4 +108,7 @@ backend/uploads/*
 *.bak
 *.backup
 
+# Configuration files with sensitive data
+backend/config.js
+
 

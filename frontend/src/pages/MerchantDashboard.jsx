@@ -76,7 +76,51 @@ const MerchantDashboard = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+    
+    // Écouter les événements de suppression de produits
+    const handleProductDeleted = (event) => {
+      const { productId, producerId } = event.detail;
+      
+      // Si c'est un produit du producteur sélectionné, mettre à jour la liste
+      if (selectedProducer && selectedProducer._id === producerId) {
+        setProducerProducts(prevProducts => 
+          prevProducts.filter(product => product._id !== productId)
+        );
+      }
+    };
+    
+    // Écouter les événements de modification de produits
+    const handleProductUpdated = (event) => {
+      const { product, producerId } = event.detail;
+      
+      // Si c'est un produit du producteur sélectionné, mettre à jour la liste
+      if (selectedProducer && selectedProducer._id === producerId) {
+        setProducerProducts(prevProducts => 
+          prevProducts.map(p => p._id === product._id ? product : p)
+        );
+      }
+    };
+    
+    // Écouter les événements de création de produits
+    const handleProductCreated = (event) => {
+      const { product, producerId } = event.detail;
+      
+      // Si c'est un produit du producteur sélectionné, ajouter à la liste
+      if (selectedProducer && selectedProducer._id === producerId) {
+        setProducerProducts(prevProducts => [product, ...prevProducts]);
+      }
+    };
+    
+    window.addEventListener('productDeleted', handleProductDeleted);
+    window.addEventListener('productUpdated', handleProductUpdated);
+    window.addEventListener('productCreated', handleProductCreated);
+    
+    return () => {
+      window.removeEventListener('productDeleted', handleProductDeleted);
+      window.removeEventListener('productUpdated', handleProductUpdated);
+      window.removeEventListener('productCreated', handleProductCreated);
+    };
+  }, [selectedProducer]);
 
   const loadData = async () => {
     try {
@@ -101,6 +145,13 @@ const MerchantDashboard = () => {
       setProducerProducts(response.data);
     } catch (error) {
       toast.error('Erreur lors du chargement des produits');
+    }
+  };
+
+  // Fonction pour mettre à jour les produits du producteur sélectionné
+  const updateProducerProducts = (updatedProducts) => {
+    if (selectedProducer) {
+      setProducerProducts(updatedProducts);
     }
   };
 

@@ -113,7 +113,7 @@ const RegisterProfileImage = ({ onImageChange, role }) => {
       {/* Message d'information */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
-          💡 <strong>Conseil :</strong> Ajouter une photo de profil aide les autres utilisateurs à vous reconnaître et renforce la confiance dans vos échanges.
+          <strong>Conseil :</strong> Ajouter une photo de profil aide les autres utilisateurs à vous reconnaître et renforce la confiance dans vos échanges.
         </p>
       </div>
     </div>
@@ -121,3 +121,5 @@ const RegisterProfileImage = ({ onImageChange, role }) => {
 };
 
 export default RegisterProfileImage;
+
+

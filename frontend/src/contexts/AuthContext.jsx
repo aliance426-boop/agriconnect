@@ -25,6 +25,25 @@ export const AuthProvider = ({ children }) => {
         try {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+          
+          // Récupérer les données utilisateur les plus récentes depuis le serveur
+          try {
+            const response = await authService.getMe();
+            const freshUserData = response.data.user;
+            
+            // Mettre à jour l'utilisateur avec les données les plus récentes
+            localStorage.setItem('user', JSON.stringify(freshUserData));
+            setUser(freshUserData);
+          } catch (error) {
+            console.error('Erreur lors de la récupération des données utilisateur:', error);
+            // Si le token est invalide, déconnecter l'utilisateur
+            if (error.response?.status === 401) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              setToken(null);
+              setUser(null);
+            }
+          }
         } catch (error) {
           console.error('Erreur lors du parsing des données utilisateur:', error);
           localStorage.removeItem('token');

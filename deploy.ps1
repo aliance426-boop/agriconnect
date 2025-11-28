@@ -29,3 +29,10 @@ Write-Host "3. Connecter le repo à Railway (backend)" -ForegroundColor White
 Write-Host "4. Configurer les variables d'environnement" -ForegroundColor White
 Write-Host ""
 Write-Host "📖 Consultez deployment-guide.md pour les instructions détaillées" -ForegroundColor Cyan
+
+
+
+
+
+
+

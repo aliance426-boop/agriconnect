@@ -114,16 +114,37 @@ const ProducerDashboard = () => {
   const handleProductSubmit = async (productData) => {
     try {
       if (editingProduct) {
-        await productService.update(editingProduct._id, productData);
+        const response = await productService.update(editingProduct._id, productData);
         toast.success('Produit modifié avec succès');
+        
+        // Mise à jour immédiate de l'état local
+        setProducts(prevProducts => 
+          prevProducts.map(product => 
+            product._id === editingProduct._id 
+              ? { ...product, ...response.data.product }
+              : product
+          )
+        );
+        
+        // Notifier les autres composants du changement
+        window.dispatchEvent(new CustomEvent('productUpdated', { 
+          detail: { product: response.data.product, producerId: user._id } 
+        }));
       } else {
-        await productService.create(productData);
+        const response = await productService.create(productData);
         toast.success('Produit créé avec succès');
+        
+        // Ajout immédiat du nouveau produit à l'état local
+        setProducts(prevProducts => [response.data.product, ...prevProducts]);
+        
+        // Notifier les autres composants du changement
+        window.dispatchEvent(new CustomEvent('productCreated', { 
+          detail: { product: response.data.product, producerId: user._id } 
+        }));
       }
       
       setShowProductForm(false);
       setEditingProduct(null);
-      loadData();
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde du produit');
     }
@@ -134,7 +155,14 @@ const ProducerDashboard = () => {
       try {
         await productService.delete(productId);
         toast.success('Produit supprimé avec succès');
-        loadData();
+        
+        // Mise à jour immédiate de l'état local sans recharger
+        setProducts(prevProducts => prevProducts.filter(product => product._id !== productId));
+        
+        // Notifier les autres composants du changement
+        window.dispatchEvent(new CustomEvent('productDeleted', { 
+          detail: { productId, producerId: user._id } 
+        }));
       } catch (error) {
         toast.error('Erreur lors de la suppression du produit');
       }

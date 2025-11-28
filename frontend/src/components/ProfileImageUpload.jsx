@@ -167,3 +167,4 @@ const ProfileImageUpload = ({ user, onImageUpdate }) => {
 };
 
 export default ProfileImageUpload;
+
