@@ -24,32 +24,37 @@ const corsOptions = {
     if (config.NODE_ENV === 'development') {
       callback(null, true);
     } else {
-      // En production, accepter uniquement le frontend Vercel
+      // En production, accepter le frontend Vercel et localhost
       const allowedOrigins = [
         config.FRONTEND_URL,
-        'https://*.vercel.app',
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'http://localhost:5173'
       ];
       
       // Si pas d'origin (requêtes depuis Postman, curl, etc.), autoriser
-      if (!origin) return callback(null, true);
-      
-      // Vérifier si l'origin est autorisé
-      const isAllowed = allowedOrigins.some(allowed => {
-        if (allowed.includes('*')) {
-          return origin.includes(allowed.replace('*.', ''));
-        }
-        return origin === allowed;
-      });
-      
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+      if (!origin) {
+        return callback(null, true);
       }
+      
+      // Vérifier si l'origin correspond exactement
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // Vérifier si l'origin est un domaine Vercel (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+      
+      // Log pour déboguer
+      console.log('CORS blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
@@ -82,8 +87,22 @@ app.get('/api/test', (req, res) => {
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Erreur serveur interne' });
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
+  
+  // Erreur CORS
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ 
+      message: 'Accès refusé par CORS',
+      origin: req.headers.origin,
+      allowedOrigins: config.NODE_ENV === 'production' ? [config.FRONTEND_URL, '*.vercel.app'] : 'all'
+    });
+  }
+  
+  res.status(500).json({ 
+    message: 'Erreur serveur interne',
+    error: config.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 // Route 404

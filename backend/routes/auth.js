@@ -7,9 +7,12 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
+// Charger la configuration
+const config = require('../config');
+
 // Générer un token JWT
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET || 'fallback_secret', {
+  return jwt.sign({ userId }, config.JWT_SECRET, {
     expiresIn: '7d'
   });
 };
