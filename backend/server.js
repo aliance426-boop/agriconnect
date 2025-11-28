@@ -85,6 +85,44 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'API AgriConnect fonctionne !' });
 });
 
+// Route racine - Informations sur l'API
+app.get('/', (req, res) => {
+  res.json({
+    name: 'AgriConnect API',
+    version: '1.0.0',
+    status: 'running',
+    message: 'Bienvenue sur l\'API AgriConnect',
+    endpoints: {
+      health: '/api/health',
+      test: '/api/test',
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        me: 'GET /api/auth/me'
+      },
+      products: {
+        list: 'GET /api/products',
+        create: 'POST /api/products',
+        myProducts: 'GET /api/products/my-products'
+      },
+      orders: {
+        list: 'GET /api/orders/my-orders',
+        create: 'POST /api/orders'
+      },
+      users: {
+        producers: 'GET /api/users/producers',
+        merchants: 'GET /api/users/merchants'
+      },
+      chatbot: {
+        conversations: 'GET /api/chatbot/conversations',
+        create: 'POST /api/chatbot/conversations'
+      }
+    },
+    documentation: 'Consultez le README pour plus d\'informations',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
@@ -105,9 +143,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Route 404
+// Route 404 - Doit être la dernière route
 app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route non trouvée' });
+  res.status(404).json({ 
+    message: 'Route non trouvée',
+    path: req.originalUrl,
+    method: req.method,
+    hint: 'Les routes API commencent par /api. Visitez / pour voir la liste des endpoints disponibles.'
+  });
 });
 
 const PORT = config.PORT || 5000;
