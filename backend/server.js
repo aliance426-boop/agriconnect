@@ -17,8 +17,42 @@ const app = express();
 // Connexion à la base de données
 connectDB();
 
-// Middleware
-app.use(cors());
+// Middleware CORS - Configuré pour accepter les requêtes depuis Vercel en production
+const corsOptions = {
+  origin: function (origin, callback) {
+    // En développement, accepter toutes les origines
+    if (config.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      // En production, accepter uniquement le frontend Vercel
+      const allowedOrigins = [
+        config.FRONTEND_URL,
+        'https://*.vercel.app',
+        'http://localhost:3000'
+      ];
+      
+      // Si pas d'origin (requêtes depuis Postman, curl, etc.), autoriser
+      if (!origin) return callback(null, true);
+      
+      // Vérifier si l'origin est autorisé
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed.includes('*')) {
+          return origin.includes(allowed.replace('*.', ''));
+        }
+        return origin === allowed;
+      });
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

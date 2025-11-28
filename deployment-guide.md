@@ -24,7 +24,73 @@ VITE_API_URL=https://votre-backend.railway.app/api
    - Build Command: `npm run build`
    - Output Directory: `dist`
 
-## 🖥️ Déploiement Backend (Railway)
+## 🖥️ Déploiement Backend (Render)
+
+### 1. Préparer le projet
+Le fichier `render.yaml` est déjà configuré à la racine du projet.
+
+### 2. Déployer sur Render
+
+#### Option A : Via render.yaml (Recommandé)
+1. Aller sur [render.com](https://render.com)
+2. Créer un compte ou se connecter
+3. Cliquer sur "New +" → "Blueprint"
+4. Connecter votre dépôt GitHub
+5. Sélectionner le dépôt `agriconnect`
+6. Render détectera automatiquement le fichier `render.yaml`
+7. Cliquer sur "Apply"
+
+#### Option B : Via l'interface web
+1. Aller sur [render.com](https://render.com)
+2. Cliquer sur "New +" → "Web Service"
+3. Connecter votre dépôt GitHub
+4. Sélectionner le dépôt `agriconnect`
+5. Configurer :
+   - **Name**: `agriconnect-backend`
+   - **Environment**: `Node`
+   - **Build Command**: `cd backend && npm install`
+   - **Start Command**: `cd backend && npm start`
+   - **Plan**: `Free`
+
+### 3. Variables d'environnement sur Render
+Dans les paramètres du service, ajouter les variables d'environnement suivantes :
+
+```env
+NODE_ENV=production
+PORT=10000
+MONGODB_URI=mongodb+srv://dili:Al55450@cluster0.jbqemdq.mongodb.net/agriconnect?retryWrites=true&w=majority
+JWT_SECRET=votre_jwt_secret_securise_tres_long_et_aleatoire
+FRONTEND_URL=https://votre-app.vercel.app
+```
+
+**Important** :
+- `PORT` doit être `10000` (port par défaut de Render)
+- `FRONTEND_URL` doit être l'URL de votre frontend Vercel
+- `MONGODB_URI` : votre URI MongoDB Atlas
+- `JWT_SECRET` : une clé secrète longue et aléatoire
+
+### 4. Configuration MongoDB Atlas
+1. Aller sur [MongoDB Atlas](https://cloud.mongodb.com)
+2. Dans "Network Access", ajouter `0.0.0.0/0` pour autoriser toutes les IPs
+3. Vérifier que votre utilisateur de base de données a les bonnes permissions
+
+### 5. Mettre à jour le Frontend Vercel
+Après avoir déployé le backend, mettre à jour la variable d'environnement dans Vercel :
+1. Aller dans les paramètres de votre projet Vercel
+2. Section "Environment Variables"
+3. Ajouter/modifier :
+   ```
+   VITE_API_URL=https://agriconnect-backend.onrender.com/api
+   ```
+4. Redéployer le frontend
+
+### 6. Vérifier le déploiement
+- Health check : `https://agriconnect-backend.onrender.com/api/health`
+- Test API : `https://agriconnect-backend.onrender.com/api/test`
+
+---
+
+## 🖥️ Déploiement Backend (Railway) - Alternative
 
 ### 1. Préparer le projet
 Créer un fichier `railway.json` à la racine:
@@ -104,12 +170,19 @@ npm install cloudinary multer-storage-cloudinary
 ## 💰 Coûts estimés
 
 - **Frontend (Vercel)** : 0€
-- **Backend (Railway)** : 0€ (500h/mois)
+- **Backend (Render)** : 0€ (750h/mois)
 - **Base de données (MongoDB Atlas)** : 0€ (512MB)
 - **Stockage (Cloudinary)** : 0€ (25GB)
 - **Total** : 0€/mois
 
 ## 🚨 Limitations gratuites
+
+### Render
+- 750h d'exécution/mois (gratuit)
+- Application "sleep" après 15 minutes d'inactivité
+- Redémarrage lent (cold start ~30-60 secondes)
+- Pas de limite de bande passante
+- Logs disponibles pendant 7 jours
 
 ### Railway
 - 500h d'exécution/mois
