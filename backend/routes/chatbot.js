@@ -63,7 +63,7 @@ const callAIAPI = async (message, conversationHistory = []) => {
     const response = await axios.post(
       GROQ_API_URL,
       {
-        model: 'llama-3.1-70b-versatile', // Modèle gratuit et puissant
+        model: 'llama-3.3-70b-versatile', // Modèle gratuit et puissant (le plus récent)
         messages: messages,
         temperature: 0.7,
         max_tokens: 1024,
