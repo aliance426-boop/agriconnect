@@ -7,8 +7,6 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [showNewConversation, setShowNewConversation] = useState(false);
-  const [newConversationTitle, setNewConversationTitle] = useState('');
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -19,10 +17,23 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
     scrollToBottom();
   }, [selectedConversation?.messages]);
 
+  // Créer automatiquement une conversation par défaut si aucune n'existe
   useEffect(() => {
-    if (conversations.length > 0 && !selectedConversation) {
-      setSelectedConversation(conversations[0]);
-    }
+    const createDefaultConversation = async () => {
+      if (conversations.length === 0 && !selectedConversation) {
+        try {
+          const response = await chatbotService.createConversation('Nouvelle conversation');
+          setSelectedConversation(response.data.conversation);
+          onConversationUpdate();
+        } catch (error) {
+          console.error('Erreur lors de la création de la conversation par défaut:', error);
+        }
+      } else if (conversations.length > 0 && !selectedConversation) {
+        setSelectedConversation(conversations[0]);
+      }
+    };
+
+    createDefaultConversation();
   }, [conversations, selectedConversation]);
 
   const handleSendMessage = async () => {
@@ -42,13 +53,13 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   };
 
   const handleCreateConversation = async () => {
-    if (!newConversationTitle.trim()) return;
-
     try {
-      const response = await chatbotService.createConversation(newConversationTitle);
+      // Générer un titre automatique basé sur le nombre de conversations
+      const conversationNumber = conversations.length + 1;
+      const title = `Conversation ${conversationNumber}`;
+      
+      const response = await chatbotService.createConversation(title);
       setSelectedConversation(response.data.conversation);
-      setNewConversationTitle('');
-      setShowNewConversation(false);
       onConversationUpdate();
       toast.success('Nouvelle conversation créée');
     } catch (error) {
@@ -93,42 +104,13 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
               Conversations
             </h3>
             <button
-              onClick={() => setShowNewConversation(true)}
+              onClick={handleCreateConversation}
               className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+              title="Nouvelle conversation"
             >
               <Plus className="w-5 h-5" />
             </button>
           </div>
-          
-          {showNewConversation && (
-            <div className="space-y-2">
-              <input
-                type="text"
-                placeholder="Titre de la conversation"
-                value={newConversationTitle}
-                onChange={(e) => setNewConversationTitle(e.target.value)}
-                className="input-field text-sm"
-                onKeyPress={(e) => e.key === 'Enter' && handleCreateConversation()}
-              />
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleCreateConversation}
-                  className="btn-primary text-sm px-3 py-1"
-                >
-                  Créer
-                </button>
-                <button
-                  onClick={() => {
-                    setShowNewConversation(false);
-                    setNewConversationTitle('');
-                  }}
-                  className="btn-outline text-sm px-3 py-1"
-                >
-                  Annuler
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">
