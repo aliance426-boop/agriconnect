@@ -111,6 +111,17 @@ const ProducerDashboard = () => {
     }
   };
 
+  // Fonction pour recharger uniquement les conversations sans afficher le loading
+  const reloadConversations = async () => {
+    try {
+      const conversationsData = await chatbotService.getConversations();
+      setConversations(conversationsData.data);
+    } catch (error) {
+      // Erreur silencieuse pour ne pas perturber l'utilisateur
+      console.error('Erreur lors du rechargement des conversations:', error);
+    }
+  };
+
   const handleProductSubmit = async (productData) => {
     try {
       if (editingProduct) {
@@ -437,7 +448,7 @@ const ProducerDashboard = () => {
           {activeTab === 'chatbot' && (
             <Chatbot 
               conversations={conversations}
-              onConversationUpdate={loadData}
+              onConversationUpdate={reloadConversations}
             />
           )}
 

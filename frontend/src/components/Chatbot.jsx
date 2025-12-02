@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 const Chatbot = ({ conversations, onConversationUpdate }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -145,8 +144,12 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                   };
                   return { ...prev, messages: newMessages };
                 });
-                // Actualiser la conversation complète
-                onConversationUpdate();
+                // Réinitialiser isStreaming AVANT d'appeler onConversationUpdate
+                setIsStreaming(false);
+                // Actualiser la conversation complète de manière asynchrone pour éviter le cercle
+                setTimeout(() => {
+                  onConversationUpdate();
+                }, 100);
                 break;
               }
 
@@ -165,7 +168,6 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       toast.error('Erreur lors de l\'envoi du message');
       // Retirer le message AI vide en cas d'erreur
       setSelectedConversation(updatedConversation);
-    } finally {
       setIsStreaming(false);
     }
   };
