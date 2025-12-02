@@ -7,6 +7,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -41,7 +42,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
 
     const userMessage = newMessage;
     setNewMessage('');
-    setSending(true);
+    setIsStreaming(true);
 
     // Ajouter immédiatement le message de l'utilisateur
     const updatedConversation = {
@@ -66,7 +67,8 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
         {
           role: 'ai',
           content: '',
-          timestamp: new Date()
+          timestamp: new Date(),
+          streaming: true // Indicateur que ce message est en cours de streaming
         }
       ]
     };
@@ -134,6 +136,15 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
               }
 
               if (data.done) {
+                // Marquer le message comme terminé
+                setSelectedConversation(prev => {
+                  const newMessages = [...prev.messages];
+                  newMessages[aiMessageIndex] = {
+                    ...newMessages[aiMessageIndex],
+                    streaming: false
+                  };
+                  return { ...prev, messages: newMessages };
+                });
                 // Actualiser la conversation complète
                 onConversationUpdate();
                 break;
@@ -155,7 +166,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       // Retirer le message AI vide en cas d'erreur
       setSelectedConversation(updatedConversation);
     } finally {
-      setSending(false);
+      setIsStreaming(false);
     }
   };
 
@@ -328,15 +339,26 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                           <User className="w-4 h-4 text-white mt-1 flex-shrink-0" />
                         )}
                         <div className="flex-1">
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          <p className={`text-xs mt-1 ${
-                            message.role === 'user' ? 'text-primary-100' : 'text-gray-500'
-                          }`}>
-                            {new Date(message.timestamp).toLocaleTimeString('fr-FR', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
+                          <p className="text-sm whitespace-pre-wrap">
+                            {message.content}
+                            {message.streaming && !message.content && (
+                              <span className="inline-flex space-x-1">
+                                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                              </span>
+                            )}
                           </p>
+                          {!message.streaming && (
+                            <p className={`text-xs mt-1 ${
+                              message.role === 'user' ? 'text-primary-100' : 'text-gray-500'
+                            }`}>
+                              {new Date(message.timestamp).toLocaleTimeString('fr-FR', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -356,18 +378,14 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Posez votre question sur l'agriculture..."
                   className="flex-1 input-field"
-                  disabled={sending}
+                  disabled={isStreaming}
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!newMessage.trim() || sending}
+                  disabled={!newMessage.trim() || isStreaming}
                   className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {sending ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </div>
