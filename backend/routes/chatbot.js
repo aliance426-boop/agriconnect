@@ -3,43 +3,98 @@ const { body, validationResult } = require('express-validator');
 const Conversation = require('../models/Conversation');
 const { auth } = require('../middleware/auth');
 const axios = require('axios');
+const config = require('../config');
 
 const router = express.Router();
 
-// Configuration pour l'API Gemini
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+// Configuration pour l'API Groq (gratuite et rapide)
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Fonction pour appeler l'API Gemini
-const callGeminiAPI = async (message) => {
+// Prompt système optimisé pour l'agriculture au Burkina Faso
+const SYSTEM_PROMPT = `Tu es AgriBot, un expert agricole spécialisé dans l'agriculture au Burkina Faso.
+
+EXPERTISE:
+- Cultures principales: mil, sorgho, maïs, riz, niébé, arachide, coton, sésame
+- Saisons: saison des pluies (juin-octobre), saison sèche (novembre-mai)
+- Régions agricoles: Centre, Nord, Sud-Ouest, Hauts-Bassins
+- Défis: sécheresse, érosion, ravageurs (chenilles légionnaires, criquets)
+
+STYLE DE RÉPONSE:
+- Concis et pratique
+- Adapté au climat sahélien
+- Conseils actionnables
+- Références aux pratiques locales
+- Mentionner les périodes optimales (mois)
+
+Réponds toujours en français de manière claire et professionnelle.`;
+
+// Fonction pour appeler l'API avec contexte conversationnel
+const callAIAPI = async (message, conversationHistory = []) => {
   try {
-    const prompt = `Tu es un conseiller agricole virtuel spécialisé au Burkina Faso. 
-    Réponds de manière concise et pratique aux questions agricoles. 
-    Inclus des conseils spécifiques au climat et aux conditions du Burkina Faso.
-    
-    Question: ${message}
-    
-    Réponse:`;
+    // Vérifier la clé API
+    const apiKey = process.env.GROQ_API_KEY || config.GROQ_API_KEY;
+    if (!apiKey) {
+      console.error('⚠️ GROQ_API_KEY non configurée');
+      return "⚠️ L'IA n'est pas configurée. Veuillez contacter l'administrateur pour configurer la clé API Groq.";
+    }
 
+    // Construire l'historique des messages (max 10 derniers pour le contexte)
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT }
+    ];
+
+    // Ajouter les derniers messages de la conversation pour le contexte
+    const recentHistory = conversationHistory.slice(-10);
+    recentHistory.forEach(msg => {
+      messages.push({
+        role: msg.role === 'ai' ? 'assistant' : 'user',
+        content: msg.content
+      });
+    });
+
+    // Ajouter le nouveau message
+    messages.push({
+      role: 'user',
+      content: message
+    });
+
+    console.log('🤖 Appel API Groq...');
+    
     const response = await axios.post(
-      `${GEMINI_API_URL}?key=${process.env.GEMINI_API_KEY}`,
+      GROQ_API_URL,
       {
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }]
+        model: 'llama-3.1-70b-versatile', // Modèle gratuit et puissant
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1024,
+        top_p: 0.9
       },
       {
         headers: {
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000 // 30 secondes timeout
       }
     );
 
-    return response.data.candidates[0].content.parts[0].text;
+    const aiResponse = response.data.choices[0].message.content;
+    console.log('✅ Réponse IA reçue');
+    return aiResponse;
+
   } catch (error) {
-    console.error('Erreur API Gemini:', error);
-    return "Désolé, je ne peux pas répondre pour le moment. Veuillez réessayer plus tard.";
+    console.error('❌ Erreur API IA:', error.response?.data || error.message);
+    
+    // Messages d'erreur plus clairs
+    if (error.response?.status === 401) {
+      return "⚠️ Clé API invalide. Veuillez vérifier la configuration de l'IA.";
+    } else if (error.response?.status === 429) {
+      return "⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.";
+    } else if (error.code === 'ECONNABORTED') {
+      return "⏱️ La requête a pris trop de temps. Veuillez réessayer avec une question plus courte.";
+    }
+    
+    return "❌ Erreur de connexion à l'IA. Veuillez réessayer dans quelques instants.";
   }
 };
 
@@ -125,8 +180,8 @@ router.post('/conversations/:id/messages', auth, [
       timestamp: new Date()
     });
 
-    // Obtenir la réponse de l'IA
-    const aiResponse = await callGeminiAPI(content);
+    // Obtenir la réponse de l'IA avec le contexte de la conversation
+    const aiResponse = await callAIAPI(content, conversation.messages);
 
     // Ajouter la réponse de l'IA
     conversation.messages.push({
