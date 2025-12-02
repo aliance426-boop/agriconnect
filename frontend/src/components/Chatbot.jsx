@@ -39,14 +39,121 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
+    const userMessage = newMessage;
+    setNewMessage('');
     setSending(true);
+
+    // Ajouter immédiatement le message de l'utilisateur
+    const updatedConversation = {
+      ...selectedConversation,
+      messages: [
+        ...selectedConversation.messages,
+        {
+          role: 'user',
+          content: userMessage,
+          timestamp: new Date()
+        }
+      ]
+    };
+    setSelectedConversation(updatedConversation);
+
+    // Ajouter un message IA vide qui sera rempli progressivement
+    const aiMessageIndex = updatedConversation.messages.length;
+    const conversationWithAIMessage = {
+      ...updatedConversation,
+      messages: [
+        ...updatedConversation.messages,
+        {
+          role: 'ai',
+          content: '',
+          timestamp: new Date()
+        }
+      ]
+    };
+    setSelectedConversation(conversationWithAIMessage);
+
     try {
-      const response = await chatbotService.sendMessage(selectedConversation._id, newMessage);
-      setSelectedConversation(response.data.conversation);
-      setNewMessage('');
-      onConversationUpdate();
+      // Utiliser l'API de streaming
+      const token = localStorage.getItem('token');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const eventSource = new EventSource(
+        `${apiUrl}/chatbot/conversations/${selectedConversation._id}/messages/stream`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'text/event-stream'
+          }
+        }
+      );
+
+      // Utiliser fetch avec stream
+      const response = await fetch(
+        `${apiUrl}/chatbot/conversations/${selectedConversation._id}/messages/stream`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ content: userMessage })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'envoi du message');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.content) {
+                accumulatedContent += data.content;
+                
+                // Mettre à jour le message AI progressivement
+                setSelectedConversation(prev => {
+                  const newMessages = [...prev.messages];
+                  newMessages[aiMessageIndex] = {
+                    ...newMessages[aiMessageIndex],
+                    content: accumulatedContent
+                  };
+                  return { ...prev, messages: newMessages };
+                });
+              }
+
+              if (data.done) {
+                // Actualiser la conversation complète
+                onConversationUpdate();
+                break;
+              }
+
+              if (data.error) {
+                toast.error(data.error);
+                break;
+              }
+            } catch (e) {
+              // Ignorer les erreurs de parsing
+            }
+          }
+        }
+      }
     } catch (error) {
+      console.error('Erreur:', error);
       toast.error('Erreur lors de l\'envoi du message');
+      // Retirer le message AI vide en cas d'erreur
+      setSelectedConversation(updatedConversation);
     } finally {
       setSending(false);
     }
