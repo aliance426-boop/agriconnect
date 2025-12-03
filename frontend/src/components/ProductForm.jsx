@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductForm = ({ product, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const ProductForm = ({ product, onSubmit, onClose }) => {
         image: null
       });
       if (product.image) {
-        setImagePreview(`http://localhost:5000/uploads/${product.image}`);
+        setImagePreview(getImageUrl(product.image));
       }
     }
   }, [product]);

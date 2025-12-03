@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from 'lucide-react';
+import { getImageUrl, getDefaultAvatarUrl } from '../utils/imageUtils';
 
 const UserAvatar = ({ 
   user, 
@@ -44,28 +45,8 @@ const UserAvatar = ({
     return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
   };
 
-  const getImageUrl = () => {
-    if (user?.profileImage) {
-      return `http://localhost:5000/uploads/${user.profileImage}`;
-    }
-    return null;
-  };
-
-  const getDefaultAvatar = () => {
-    if (!user) return '/images/default-avatars/producer-default.svg';
-    
-    switch (user.role) {
-      case 'PRODUCER':
-        return '/images/default-avatars/producer-default.svg';
-      case 'MERCHANT':
-        return '/images/default-avatars/merchant-default.svg';
-      default:
-        return '/images/default-avatars/producer-default.svg';
-    }
-  };
-
   const avatarContent = () => {
-    const imageUrl = getImageUrl();
+    const imageUrl = user?.profileImage ? getImageUrl(user.profileImage) : null;
     
     if (imageUrl) {
       return (
@@ -82,14 +63,18 @@ const UserAvatar = ({
       );
     }
     
+    const defaultAvatar = user ? getDefaultAvatarUrl(user.role) : getDefaultAvatarUrl('PRODUCER');
+    
     return (
       <img
-        src={getDefaultAvatar()}
+        src={defaultAvatar}
         alt={`Avatar par défaut ${user?.role === 'PRODUCER' ? 'Producteur' : 'Commerçant'}`}
         className="w-full h-full object-cover"
       />
     );
   };
+
+  const defaultAvatar = user ? getDefaultAvatarUrl(user.role) : getDefaultAvatarUrl('PRODUCER');
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
@@ -97,7 +82,7 @@ const UserAvatar = ({
         {avatarContent()}
         {/* Fallback avec avatar par défaut (caché par défaut) */}
         <img
-          src={getDefaultAvatar()}
+          src={defaultAvatar}
           alt={`Avatar par défaut ${user?.role === 'PRODUCER' ? 'Producteur' : 'Commerçant'}`}
           className="w-full h-full object-cover"
           style={{ display: 'none' }}

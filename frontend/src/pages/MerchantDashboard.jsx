@@ -23,6 +23,7 @@ import SearchBar from '../components/SearchBar';
 import FilterDropdown from '../components/FilterDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import StockIndicator from '../components/StockIndicator';
+import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
 import { useFilters } from '../hooks/useFilters';
@@ -378,7 +379,7 @@ const MerchantDashboard = () => {
                                 {product.image && (
                                   <div className="aspect-w-16 aspect-h-9 mb-4">
                                     <img
-                                      src={`http://localhost:5000/uploads/${product.image}`}
+                                      src={getImageUrl(product.image)}
                                       alt={product.title}
                                       className="w-full h-32 object-cover rounded-lg"
                                     />

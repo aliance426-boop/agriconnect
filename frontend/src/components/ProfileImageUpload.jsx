@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, Upload, X, User } from 'lucide-react';
 import { userService } from '../services/api';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProfileImageUpload = ({ user, onImageUpdate }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -67,10 +68,10 @@ const ProfileImageUpload = ({ user, onImageUpdate }) => {
     fileInput.value = '';
   };
 
-  const getImageUrl = () => {
+  const getCurrentImageUrl = () => {
     if (preview) return preview;
     if (user?.profileImage) {
-      return `http://localhost:5000/uploads/${user.profileImage}`;
+      return getImageUrl(user.profileImage);
     }
     return null;
   };
@@ -81,11 +82,15 @@ const ProfileImageUpload = ({ user, onImageUpdate }) => {
         {/* Photo de profil actuelle */}
         <div className="relative">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-            {getImageUrl() ? (
+            {getCurrentImageUrl() ? (
               <img
-                src={getImageUrl()}
+                src={getCurrentImageUrl()}
                 alt="Photo de profil"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Si l'image ne charge pas, afficher l'icône par défaut
+                  e.target.style.display = 'none';
+                }}
               />
             ) : (
               <User className="w-12 h-12 text-gray-400" />

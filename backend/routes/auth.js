@@ -120,7 +120,8 @@ router.post('/login', [
         lastName: user.lastName,
         email: user.email,
         role: user.role,
-        companyName: user.companyName
+        companyName: user.companyName,
+        profileImage: user.profileImage
       }
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Package, User, Phone, MapPin } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 const OrderForm = ({ product, producer, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ const OrderForm = ({ product, producer, onSubmit, onClose }) => {
             <div className="flex items-start space-x-4">
               {product.image && (
                 <img
-                  src={`http://localhost:5000/uploads/${product.image}`}
+                  src={getImageUrl(product.image)}
                   alt={product.title}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
