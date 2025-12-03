@@ -28,6 +28,7 @@ import FilterDropdown from '../components/FilterDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import StockIndicator from '../components/StockIndicator';
 import Pagination from '../components/Pagination';
+import ThemeToggle from '../components/ThemeToggle';
 import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
@@ -259,13 +260,13 @@ const ProducerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 Tableau de Bord Producteur
               </h1>
             </div>
@@ -273,14 +274,15 @@ const ProducerDashboard = () => {
             <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
               <UserAvatar user={user} size="md" />
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-sm text-gray-500">Producteur</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Producteur</p>
               </div>
+              <ThemeToggle />
               <button
                 onClick={logout}
-                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base"
+                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 text-sm sm:text-base transition-colors duration-200"
               >
                 <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="hidden sm:inline">Déconnexion</span>
@@ -409,8 +411,8 @@ const ProducerDashboard = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {filteredProducts.map((product) => (
-                    <div key={product._id} className="card">
+                  {filteredProducts.map((product, index) => (
+                    <div key={product._id} className="card animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
                       {product.image && (
                         <div className="aspect-w-16 aspect-h-9 mb-4">
                           <img

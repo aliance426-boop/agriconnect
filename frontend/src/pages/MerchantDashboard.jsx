@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { userService, productService, orderService } from '../services/api';
+import { userService, productService, orderService, favoriteService } from '../services/api';
 import { 
   Users, 
   Package, 
@@ -10,7 +10,8 @@ import {
   Phone,
   MapPin,
   MessageCircle,
-  Eye
+  Eye,
+  Heart
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,6 +25,8 @@ import FilterDropdown from '../components/FilterDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import StockIndicator from '../components/StockIndicator';
 import Pagination from '../components/Pagination';
+import ThemeToggle from '../components/ThemeToggle';
+import FavoriteButton from '../components/FavoriteButton';
 import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
@@ -34,6 +37,7 @@ const MerchantDashboard = () => {
   const { user, logout, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState('producers');
   const [producers, setProducers] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [selectedProducer, setSelectedProducer] = useState(null);
   const [producerProducts, setProducerProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -134,9 +138,10 @@ const MerchantDashboard = () => {
   const loadData = async (producersPage = 1, ordersPage = 1) => {
     try {
       setLoading(true);
-      const [producersData, ordersData] = await Promise.all([
+      const [producersData, ordersData, favoritesData] = await Promise.all([
         userService.getProducers(producersPage, 12),
-        orderService.getMyOrders(ordersPage, 10)
+        orderService.getMyOrders(ordersPage, 10),
+        favoriteService.getFavorites().catch(() => ({ data: [] })) // Ignorer erreur si pas de favoris
       ]);
 
       // Gérer la réponse paginée des producteurs
@@ -156,6 +161,9 @@ const MerchantDashboard = () => {
         // Rétrocompatibilité si pas de pagination
         setOrders(ordersData.data);
       }
+
+      // Gérer les favoris
+      setFavorites(favoritesData.data || []);
     } catch (error) {
       toast.error('Erreur lors du chargement des données');
     } finally {
@@ -229,13 +237,13 @@ const MerchantDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 Tableau de Bord Commerçant
               </h1>
             </div>
@@ -243,14 +251,15 @@ const MerchantDashboard = () => {
             <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
               <UserAvatar user={user} size="md" />
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-sm text-gray-500">{user?.companyName}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{user?.companyName}</p>
               </div>
+              <ThemeToggle />
               <button
                 onClick={logout}
-                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base"
+                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 text-sm sm:text-base transition-colors duration-200"
               >
                 <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="hidden sm:inline">Déconnexion</span>
@@ -266,6 +275,7 @@ const MerchantDashboard = () => {
           <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max sm:min-w-0">
             {[
               { id: 'producers', label: 'Producteurs', icon: Users, shortLabel: 'Producteurs' },
+              { id: 'favorites', label: 'Favoris', icon: Heart, shortLabel: 'Favoris' },
               { id: 'orders', label: 'Mes Commandes', icon: ShoppingCart, shortLabel: 'Commandes' },
               { id: 'profile', label: 'Profil', icon: User, shortLabel: 'Profil' }
             ].map((tab) => (
@@ -291,7 +301,7 @@ const MerchantDashboard = () => {
           {/* Producers Tab */}
           {activeTab === 'producers' && (
             <div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Producteurs Disponibles ({filteredProducers.length} sur {producers.length})
               </h2>
 
@@ -328,20 +338,20 @@ const MerchantDashboard = () => {
               {producers.length === 0 ? (
                 <div className="card text-center py-12">
                   <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     Aucun producteur
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Aucun producteur n'est encore inscrit sur la plateforme
                   </p>
                 </div>
               ) : filteredProducers.length === 0 ? (
                 <div className="card text-center py-12">
                   <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     Aucun producteur trouvé
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
                     Aucun producteur ne correspond à vos critères de recherche
                   </p>
                   <button
@@ -356,27 +366,31 @@ const MerchantDashboard = () => {
                   {/* Producers List */}
                   <div className="lg:col-span-1 order-2 lg:order-1">
                     <div className="space-y-4">
-                      {filteredProducers.map((producer) => (
+                      {filteredProducers.map((producer, index) => (
                         <div
                           key={producer._id}
-                          className={`card cursor-pointer transition-colors ${
+                          className={`card cursor-pointer transition-all duration-200 animate-slide-up ${
                             selectedProducer?._id === producer._id
-                              ? 'ring-2 ring-primary-500 bg-primary-50'
-                              : 'hover:shadow-md'
+                              ? 'ring-2 ring-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                              : 'hover:shadow-md dark:hover:shadow-lg'
                           }`}
+                          style={{ animationDelay: `${index * 0.05}s` }}
                           onClick={() => handleProducerSelect(producer)}
                         >
                           <div className="flex items-start space-x-2 sm:space-x-3">
                             <UserAvatar user={producer} size="md" />
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
-                                {producer.firstName} {producer.lastName}
-                              </h3>
-                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mt-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
+                                  {producer.firstName} {producer.lastName}
+                                </h3>
+                                <FavoriteButton producerId={producer._id} />
+                              </div>
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                 <span className="truncate">{producer.location}</span>
                               </div>
-                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mt-1">
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                 <span className="truncate">{producer.phone}</span>
                               </div>
@@ -405,7 +419,7 @@ const MerchantDashboard = () => {
                     {selectedProducer ? (
                       <div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                             Produits de {selectedProducer.firstName} {selectedProducer.lastName}
                           </h3>
                           <button
@@ -429,8 +443,8 @@ const MerchantDashboard = () => {
                           </div>
                         ) : (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {producerProducts.map((product) => (
-                              <div key={product._id} className="card">
+                            {producerProducts.map((product, index) => (
+                              <div key={product._id} className="card animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
                                 {product.image && (
                                   <div className="aspect-w-16 aspect-h-9 mb-4">
                                     <img
@@ -492,10 +506,158 @@ const MerchantDashboard = () => {
                     ) : (
                       <div className="card text-center py-12">
                         <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                           Sélectionnez un producteur
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 dark:text-gray-400">
+                          Cliquez sur un producteur pour voir ses produits
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Favorites Tab */}
+          {activeTab === 'favorites' && (
+            <div>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                Mes Favoris ({favorites.length})
+              </h2>
+
+              {favorites.length === 0 ? (
+                <div className="card text-center py-12 animate-fade-in">
+                  <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Aucun favori
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Ajoutez des producteurs à vos favoris pour y accéder rapidement
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="lg:col-span-1">
+                    <div className="space-y-4">
+                      {favorites.map((producer, index) => (
+                        <div
+                          key={producer._id}
+                          className={`card cursor-pointer transition-all duration-200 animate-slide-up ${
+                            selectedProducer?._id === producer._id
+                              ? 'ring-2 ring-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                              : 'hover:shadow-md dark:hover:shadow-lg'
+                          }`}
+                          style={{ animationDelay: `${index * 0.05}s` }}
+                          onClick={() => handleProducerSelect(producer)}
+                        >
+                          <div className="flex items-start space-x-2 sm:space-x-3">
+                            <UserAvatar user={producer} size="md" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
+                                  {producer.firstName} {producer.lastName}
+                                </h3>
+                                <FavoriteButton 
+                                  producerId={producer._id} 
+                                  onToggle={() => {
+                                    setFavorites(favorites.filter(f => f._id !== producer._id));
+                                    if (selectedProducer?._id === producer._id) {
+                                      setSelectedProducer(null);
+                                      setProducerProducts([]);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">{producer.location}</span>
+                              </div>
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">{producer.phone}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="lg:col-span-2">
+                    {selectedProducer ? (
+                      <div className="animate-scale-in">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                            Produits de {selectedProducer.firstName} {selectedProducer.lastName}
+                          </h3>
+                          <button
+                            onClick={() => handleWhatsAppContact(selectedProducer.phone, selectedProducer.firstName)}
+                            className="btn-secondary flex items-center space-x-2 w-full sm:w-auto justify-center"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>WhatsApp</span>
+                          </button>
+                        </div>
+
+                        {producerProducts.length === 0 ? (
+                          <div className="card text-center py-12">
+                            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                              Aucun produit
+                            </h4>
+                            <p className="text-gray-600 dark:text-gray-400">
+                              Ce producteur n'a pas encore de produits disponibles
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {producerProducts.map((product, index) => (
+                              <div key={product._id} className="card animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                  <img
+                                    src={getImageUrl(product.image)}
+                                    alt={product.name}
+                                    className="w-full sm:w-24 h-32 sm:h-24 object-cover rounded-lg"
+                                  />
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                                      {product.name}
+                                    </h4>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                      {product.description}
+                                    </p>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                                        {product.price.toLocaleString()} FCFA
+                                      </span>
+                                      <StockIndicator quantity={product.quantity} />
+                                    </div>
+                                    <button
+                                      onClick={() => handleProductSelect(product)}
+                                      disabled={product.quantity === 0}
+                                      className={`w-full ${
+                                        product.quantity === 0 
+                                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                          : 'btn-primary'
+                                      }`}
+                                    >
+                                      {product.quantity === 0 ? 'Rupture de stock' : 'Commander'}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="card text-center py-12">
+                        <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                          Sélectionnez un producteur
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
                           Cliquez sur un producteur pour voir ses produits
                         </p>
                       </div>

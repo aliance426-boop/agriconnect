@@ -114,6 +114,14 @@ export const chatbotService = {
   deleteConversation: (conversationId) => api.delete(`/chatbot/conversations/${conversationId}`),
 };
 
+// Services des favoris
+export const favoriteService = {
+  getFavorites: () => api.get('/favorites'),
+  addFavorite: (producerId) => api.post(`/favorites/${producerId}`),
+  removeFavorite: (producerId) => api.delete(`/favorites/${producerId}`),
+  checkFavorite: (producerId) => api.get(`/favorites/check/${producerId}`),
+};
+
 export default api;
 
 

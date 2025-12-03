@@ -11,6 +11,7 @@ const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const chatbotRoutes = require('./routes/chatbot');
 const userRoutes = require('./routes/users');
+const favoriteRoutes = require('./routes/favorites');
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 // Route de santé pour le déploiement
 app.get('/api/health', (req, res) => {
