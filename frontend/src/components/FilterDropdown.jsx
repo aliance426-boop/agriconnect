@@ -23,16 +23,16 @@ const FilterDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-full bg-white border border-gray-300 rounded-lg shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+        className="relative w-full bg-white border border-gray-300 rounded-lg shadow-sm pl-3 pr-8 sm:pr-10 py-2 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 min-w-[140px] sm:min-w-0"
       >
-        <div className="flex items-center">
-          <Filter className="h-4 w-4 text-gray-400 mr-2" />
-          <span className="block truncate text-sm">
+        <div className="flex items-center min-w-0 flex-1">
+          <Filter className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
+          <span className="block text-xs sm:text-sm leading-tight overflow-hidden text-ellipsis whitespace-nowrap flex-1">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <ChevronDown className="h-5 w-5 text-gray-400" />
+          <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
         </span>
       </button>
 

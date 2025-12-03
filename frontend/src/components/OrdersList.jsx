@@ -54,9 +54,9 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
         type: 'select',
         options: [
           { value: 'all', label: 'Tous les montants' },
-          { value: 'low', label: 'Moins de 10 000 FCFA' },
-          { value: 'medium', label: '10 000 - 50 000 FCFA' },
-          { value: 'high', label: 'Plus de 50 000 FCFA' }
+          { value: 'low', label: '< 10 000 FCFA' },
+          { value: 'medium', label: '10k - 50k FCFA' },
+          { value: 'high', label: '> 50 000 FCFA' }
         ]
       }
     ]
@@ -149,29 +149,32 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
                 onClear={clearOrderSearch}
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <FilterDropdown
-                label="Statut"
-                options={orderFilterConfig.filters[0].options}
-                value={orderFilters.status || 'all'}
-                onChange={(value) => updateOrderFilter('status', value)}
-                placeholder="Tous les statuts"
-              />
-              <FilterDropdown
-                label="Période"
-                options={orderFilterConfig.filters[1].options}
-                value={orderFilters.dateRange || 'all'}
-                onChange={(value) => updateOrderFilter('dateRange', value)}
-                placeholder="Toutes les périodes"
-              />
-              <FilterDropdown
-                label="Montant"
-                options={orderFilterConfig.filters[2].options}
-                value={orderFilters.amountRange || 'all'}
-                onChange={(value) => updateOrderFilter('amountRange', value)}
-                placeholder="Tous les montants"
-              />
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <FilterDropdown
+              label="Statut"
+              options={orderFilterConfig.filters[0].options}
+              value={orderFilters.status || 'all'}
+              onChange={(value) => updateOrderFilter('status', value)}
+              placeholder="Tous les statuts"
+              className="w-full sm:w-auto sm:min-w-[140px]"
+            />
+            <FilterDropdown
+              label="Période"
+              options={orderFilterConfig.filters[1].options}
+              value={orderFilters.dateRange || 'all'}
+              onChange={(value) => updateOrderFilter('dateRange', value)}
+              placeholder="Toutes les périodes"
+              className="w-full sm:w-auto sm:min-w-[150px]"
+            />
+            <FilterDropdown
+              label="Montant"
+              options={orderFilterConfig.filters[2].options}
+              value={orderFilters.amountRange || 'all'}
+              onChange={(value) => updateOrderFilter('amountRange', value)}
+              placeholder="Tous les montants"
+              className="w-full sm:w-auto sm:min-w-[160px]"
+            />
+          </div>
           </div>
 
           {/* Filtres actifs */}
