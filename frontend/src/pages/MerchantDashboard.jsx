@@ -176,9 +176,17 @@ const MerchantDashboard = () => {
   const loadProducerProducts = async (producerId) => {
     try {
       const response = await productService.getAll({ producerId });
-      setProducerProducts(response.data);
+      // Gérer la réponse paginée ou non paginée
+      if (response.data.products) {
+        setProducerProducts(response.data.products);
+      } else {
+        // Rétrocompatibilité si pas de pagination (tableau direct)
+        setProducerProducts(response.data);
+      }
     } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
       toast.error('Erreur lors du chargement des produits');
+      setProducerProducts([]);
     }
   };
 
