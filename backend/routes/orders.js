@@ -7,10 +7,14 @@ const { auth, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // @route   GET /api/orders/my-orders
-// @desc    Obtenir les commandes de l'utilisateur connecté
+// @desc    Obtenir les commandes de l'utilisateur connecté (avec pagination)
 // @access  Private
 router.get('/my-orders', auth, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     let filter = {};
     
     if (req.user.role === 'MERCHANT') {
@@ -19,13 +23,28 @@ router.get('/my-orders', auth, async (req, res) => {
       filter.producerId = req.user._id;
     }
 
-    const orders = await Order.find(filter)
-      .populate('merchantId', 'firstName lastName phone companyName')
-      .populate('producerId', 'firstName lastName phone location')
-      .populate('productId', 'title price category image')
-      .sort({ createdAt: -1 });
+    const [orders, total] = await Promise.all([
+      Order.find(filter)
+        .populate('merchantId', 'firstName lastName phone companyName')
+        .populate('producerId', 'firstName lastName phone location')
+        .populate('productId', 'title price category image')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Order.countDocuments(filter)
+    ]);
 
-    res.json(orders);
+    res.json({
+      orders,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération des commandes:', error);
     res.status(500).json({ message: 'Erreur serveur' });
@@ -111,10 +130,27 @@ router.put('/:id/status', auth, requireRole(['PRODUCER']), [
     order.status = status;
     
     if (status === 'ACCEPTED') {
+      // Vérifier et réduire la quantité du produit
+      const product = await Product.findById(order.productId);
+      if (!product) {
+        return res.status(404).json({ message: 'Produit non trouvé' });
+      }
+      
+      // Vérifier que le stock est suffisant
+      if (product.quantity < order.quantity) {
+        return res.status(400).json({ 
+          message: `Stock insuffisant. Disponible: ${product.quantity}, Demandé: ${order.quantity}` 
+        });
+      }
+      
       // Réduire la quantité du produit
+      product.quantity -= order.quantity;
+      await product.save();
+    } else if (status === 'REFUSED' && order.status === 'ACCEPTED') {
+      // Si on refuse une commande déjà acceptée, restaurer le stock
       const product = await Product.findById(order.productId);
       if (product) {
-        product.quantity -= order.quantity;
+        product.quantity += order.quantity;
         await product.save();
       }
     }

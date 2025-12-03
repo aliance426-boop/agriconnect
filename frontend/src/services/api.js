@@ -63,7 +63,7 @@ export const authService = {
 // Services des produits
 export const productService = {
   getAll: (params = {}) => api.get('/products', { params }),
-  getMyProducts: () => api.get('/products/my-products'),
+  getMyProducts: (page = 1, limit = 12) => api.get('/products/my-products', { params: { page, limit } }),
   create: (productData) => {
     const formData = new FormData();
     Object.keys(productData).forEach(key => {
@@ -91,14 +91,14 @@ export const productService = {
 
 // Services des commandes
 export const orderService = {
-  getMyOrders: () => api.get('/orders/my-orders'),
+  getMyOrders: (page = 1, limit = 10) => api.get('/orders/my-orders', { params: { page, limit } }),
   create: (orderData) => api.post('/orders', orderData),
   updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
 };
 
 // Services des utilisateurs
 export const userService = {
-  getProducers: () => api.get('/users/producers'),
+  getProducers: (page = 1, limit = 12) => api.get('/users/producers', { params: { page, limit } }),
   getMerchants: () => api.get('/users/merchants'),
   updateProfile: (profileData) => api.put('/users/profile', profileData),
   uploadProfileImage: (formData) => api.post('/users/profile-image', formData, {

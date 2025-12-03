@@ -27,6 +27,7 @@ import SearchBar from '../components/SearchBar';
 import FilterDropdown from '../components/FilterDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import StockIndicator from '../components/StockIndicator';
+import Pagination from '../components/Pagination';
 import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
@@ -41,6 +42,18 @@ const ProducerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [productsPagination, setProductsPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 12
+  });
+  const [ordersPagination, setOrdersPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10
+  });
 
   // Configuration des filtres pour les produits
   const productFilterConfig = {
@@ -93,23 +106,49 @@ const ProducerDashboard = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (productsPage = 1, ordersPage = 1) => {
     try {
       setLoading(true);
       const [productsData, ordersData, conversationsData] = await Promise.all([
-        productService.getMyProducts(),
-        orderService.getMyOrders(),
+        productService.getMyProducts(productsPage, 12),
+        orderService.getMyOrders(ordersPage, 10),
         chatbotService.getConversations()
       ]);
 
-      setProducts(productsData.data);
-      setOrders(ordersData.data);
+      // Gérer la réponse paginée des produits
+      if (productsData.data.products) {
+        setProducts(productsData.data.products);
+        setProductsPagination(productsData.data.pagination);
+      } else {
+        // Rétrocompatibilité si pas de pagination
+        setProducts(productsData.data);
+      }
+
+      // Gérer la réponse paginée des commandes
+      if (ordersData.data.orders) {
+        setOrders(ordersData.data.orders);
+        setOrdersPagination(ordersData.data.pagination);
+      } else {
+        // Rétrocompatibilité si pas de pagination
+        setOrders(ordersData.data);
+      }
+
       setConversations(conversationsData.data);
     } catch (error) {
       toast.error('Erreur lors du chargement des données');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProductsPageChange = (page) => {
+    loadData(page, ordersPagination.currentPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOrdersPageChange = (page) => {
+    loadData(productsPagination.currentPage, page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Fonction pour recharger uniquement les conversations sans afficher le loading
@@ -433,6 +472,17 @@ const ProducerDashboard = () => {
                     </div>
                   ))}
                 </div>
+              )}
+              
+              {/* Pagination pour les produits */}
+              {productsPagination.totalPages > 1 && (
+                <Pagination
+                  currentPage={productsPagination.currentPage}
+                  totalPages={productsPagination.totalPages}
+                  totalItems={productsPagination.totalItems}
+                  itemsPerPage={productsPagination.itemsPerPage}
+                  onPageChange={handleProductsPageChange}
+                />
               )}
             </div>
           )}

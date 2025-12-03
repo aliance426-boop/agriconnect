@@ -7,21 +7,39 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 // @route   GET /api/products
-// @desc    Obtenir tous les produits actifs
+// @desc    Obtenir tous les produits actifs (avec pagination)
 // @access  Public
 router.get('/', async (req, res) => {
   try {
     const { category, producerId } = req.query;
-    let filter = { isActive: true };
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
 
+    let filter = { isActive: true };
     if (category) filter.category = category;
     if (producerId) filter.producerId = producerId;
 
-    const products = await Product.find(filter)
-      .populate('producerId', 'firstName lastName phone location companyName')
-      .sort({ createdAt: -1 });
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .populate('producerId', 'firstName lastName phone location companyName')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments(filter)
+    ]);
 
-    res.json(products);
+    res.json({
+      products,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération des produits:', error);
     res.status(500).json({ message: 'Erreur serveur' });
@@ -29,14 +47,35 @@ router.get('/', async (req, res) => {
 });
 
 // @route   GET /api/products/my-products
-// @desc    Obtenir les produits du producteur connecté
+// @desc    Obtenir les produits du producteur connecté (avec pagination)
 // @access  Private (Producteur seulement)
 router.get('/my-products', auth, requireRole(['PRODUCER']), async (req, res) => {
   try {
-    const products = await Product.find({ producerId: req.user._id, isActive: true })
-      .sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
 
-    res.json(products);
+    const filter = { producerId: req.user._id, isActive: true };
+    
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments(filter)
+    ]);
+
+    res.json({
+      products,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération des produits:', error);
     res.status(500).json({ message: 'Erreur serveur' });

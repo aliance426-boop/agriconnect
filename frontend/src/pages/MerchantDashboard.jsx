@@ -23,6 +23,7 @@ import SearchBar from '../components/SearchBar';
 import FilterDropdown from '../components/FilterDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import StockIndicator from '../components/StockIndicator';
+import Pagination from '../components/Pagination';
 import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
@@ -39,6 +40,18 @@ const MerchantDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [producersPagination, setProducersPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 12
+  });
+  const [ordersPagination, setOrdersPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10
+  });
 
   // Configuration des filtres pour les producteurs
   const producerFilterConfig = {
@@ -118,21 +131,46 @@ const MerchantDashboard = () => {
     };
   }, [selectedProducer]);
 
-  const loadData = async () => {
+  const loadData = async (producersPage = 1, ordersPage = 1) => {
     try {
       setLoading(true);
       const [producersData, ordersData] = await Promise.all([
-        userService.getProducers(),
-        orderService.getMyOrders()
+        userService.getProducers(producersPage, 12),
+        orderService.getMyOrders(ordersPage, 10)
       ]);
 
-      setProducers(producersData.data);
-      setOrders(ordersData.data);
+      // Gérer la réponse paginée des producteurs
+      if (producersData.data.producers) {
+        setProducers(producersData.data.producers);
+        setProducersPagination(producersData.data.pagination);
+      } else {
+        // Rétrocompatibilité si pas de pagination
+        setProducers(producersData.data);
+      }
+
+      // Gérer la réponse paginée des commandes
+      if (ordersData.data.orders) {
+        setOrders(ordersData.data.orders);
+        setOrdersPagination(ordersData.data.pagination);
+      } else {
+        // Rétrocompatibilité si pas de pagination
+        setOrders(ordersData.data);
+      }
     } catch (error) {
       toast.error('Erreur lors du chargement des données');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProducersPageChange = (page) => {
+    loadData(page, ordersPagination.currentPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOrdersPageChange = (page) => {
+    loadData(producersPagination.currentPage, page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const loadProducerProducts = async (producerId) => {
@@ -339,6 +377,19 @@ const MerchantDashboard = () => {
                         </div>
                       ))}
                     </div>
+                    
+                    {/* Pagination pour les producteurs */}
+                    {producersPagination.totalPages > 1 && (
+                      <div className="mt-4">
+                        <Pagination
+                          currentPage={producersPagination.currentPage}
+                          totalPages={producersPagination.totalPages}
+                          totalItems={producersPagination.totalItems}
+                          itemsPerPage={producersPagination.itemsPerPage}
+                          onPageChange={handleProducersPageChange}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Producer Products */}

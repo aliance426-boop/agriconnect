@@ -7,16 +7,36 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 // @route   GET /api/users/producers
-// @desc    Obtenir tous les producteurs
+// @desc    Obtenir tous les producteurs (avec pagination)
 // @access  Private (Commerçant seulement)
 router.get('/producers', auth, requireRole(['MERCHANT']), async (req, res) => {
   try {
-    const producers = await User.find({ 
-      role: 'PRODUCER', 
-      isActive: true 
-    }).select('-password').sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
 
-    res.json(producers);
+    const filter = { role: 'PRODUCER', isActive: true };
+
+    const [producers, total] = await Promise.all([
+      User.find(filter)
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(filter)
+    ]);
+
+    res.json({
+      producers,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération des producteurs:', error);
     res.status(500).json({ message: 'Erreur serveur' });
