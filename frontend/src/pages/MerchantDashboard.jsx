@@ -27,6 +27,7 @@ import { getImageUrl } from '../utils/imageUtils';
 
 // Hooks
 import { useFilters } from '../hooks/useFilters';
+import { getLocationFilterOptions } from '../utils/locations';
 
 const MerchantDashboard = () => {
   const { user, logout, updateUser } = useAuth();
@@ -50,25 +51,7 @@ const MerchantDashboard = () => {
         type: 'select',
         options: [
           { value: 'all', label: 'Toutes les localisations' },
-          { value: 'Ouagadougou', label: 'Ouagadougou' },
-          { value: 'Bobo-Dioulasso', label: 'Bobo-Dioulasso' },
-          { value: 'Koudougou', label: 'Koudougou' },
-          { value: 'Ouahigouya', label: 'Ouahigouya' },
-          { value: 'Banfora', label: 'Banfora' },
-          { value: 'Dédougou', label: 'Dédougou' },
-          { value: 'Kaya', label: 'Kaya' },
-          { value: 'Dori', label: 'Dori' },
-          { value: 'Fada N\'gourma', label: 'Fada N\'gourma' },
-          { value: 'Tenkodogo', label: 'Tenkodogo' },
-          { value: 'Manga', label: 'Manga' },
-          { value: 'Zorgho', label: 'Zorgho' },
-          { value: 'Gaoua', label: 'Gaoua' },
-          { value: 'Réo', label: 'Réo' },
-          { value: 'Nouna', label: 'Nouna' },
-          { value: 'Tougan', label: 'Tougan' },
-          { value: 'Djibo', label: 'Djibo' },
-          { value: 'Gorom-Gorom', label: 'Gorom-Gorom' },
-          { value: 'Autres', label: 'Autres' }
+          ...getLocationFilterOptions()
         ]
       }
     ]

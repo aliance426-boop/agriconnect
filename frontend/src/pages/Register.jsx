@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Building, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import RegisterProfileImage from '../components/RegisterProfileImage';
+import { BURKINA_FASO_LOCATIONS } from '../utils/locations';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -21,14 +22,45 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [customLocation, setCustomLocation] = useState('');
   
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'location') {
+      if (value === 'Autres') {
+        // Si "Autres" est sélectionné, garder "Autres" dans formData mais réinitialiser customLocation
+        setFormData({
+          ...formData,
+          location: 'Autres'
+        });
+        setCustomLocation('');
+      } else {
+        // Si une localisation de la liste est sélectionnée, l'utiliser directement
+        setFormData({
+          ...formData,
+          location: value
+        });
+        setCustomLocation('');
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
+  };
+
+  const handleCustomLocationChange = (e) => {
+    const value = e.target.value;
+    setCustomLocation(value);
+    // Mettre à jour formData.location avec la valeur personnalisée
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      location: value
     });
   };
 
@@ -45,6 +77,19 @@ const Register = () => {
 
     if (formData.password.length < 6) {
       toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      setLoading(false);
+      return;
+    }
+
+    // Validation de la localisation
+    if (!formData.location || formData.location === '') {
+      toast.error('Veuillez sélectionner ou saisir une localisation');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.location === 'Autres' && !customLocation) {
+      toast.error('Veuillez saisir votre localisation');
       setLoading(false);
       return;
     }
@@ -249,20 +294,44 @@ const Register = () => {
                 Localisation
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                   <MapPin className="h-5 w-5 text-gray-400" />
                 </div>
-                <input
+                <select
                   id="location"
                   name="location"
-                  type="text"
-                  required
-                  className="input-field pl-10"
-                  placeholder="Ville, Région"
-                  value={formData.location}
+                  required={!customLocation}
+                  className="input-field pl-10 appearance-none bg-white"
+                  value={customLocation ? 'Autres' : (formData.location || '')}
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Sélectionnez une localisation</option>
+                  {BURKINA_FASO_LOCATIONS.map((location) => (
+                    <option key={location.value} value={location.value}>
+                      {location.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
+              
+              {/* Champ de saisie manuelle si "Autres" est sélectionné */}
+              {(formData.location === 'Autres' || customLocation) && (
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    placeholder="Saisissez votre localisation"
+                    required
+                    className="input-field"
+                    value={customLocation}
+                    onChange={handleCustomLocationChange}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Company Name (for merchants) */}
