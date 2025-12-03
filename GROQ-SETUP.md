@@ -96,3 +96,5 @@ C'est largement suffisant pour votre application !
 
 **Félicitations !** 🎉 Votre IA agricole est maintenant opérationnelle !
 
+
+

@@ -32,24 +32,24 @@ const OrderForm = ({ product, producer, onSubmit, onClose }) => {
   const totalPrice = product.price * formData.quantity;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center p-4 sm:p-6 border-b">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Passer une commande
           </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Product Info */}
           <div className="card mb-6">
-            <div className="flex items-start space-x-4">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
               {product.image && (
                 <img
                   src={getImageUrl(product.image)}
@@ -64,8 +64,8 @@ const OrderForm = ({ product, producer, onSubmit, onClose }) => {
                 <p className="text-sm text-gray-600 mb-2">
                   {product.category}
                 </p>
-                <div className="flex items-center space-x-4">
-                  <span className="text-xl font-bold text-primary-600">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4">
+                  <span className="text-lg sm:text-xl font-bold text-primary-600">
                     {product.price} FCFA
                   </span>
                   <span className="text-sm text-gray-600">
@@ -163,17 +163,17 @@ const OrderForm = ({ product, producer, onSubmit, onClose }) => {
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3 pt-4 border-t">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors w-full sm:w-auto"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                className="btn-primary"
+                className="btn-primary w-full sm:w-auto"
               >
                 Confirmer la commande
               </button>

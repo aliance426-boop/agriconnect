@@ -224,16 +224,16 @@ const ProducerDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                 Tableau de Bord Producteur
               </h1>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
               <UserAvatar user={user} size="md" />
-              <div className="text-right">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium text-gray-900">
                   {user?.firstName} {user?.lastName}
                 </p>
@@ -241,10 +241,10 @@ const ProducerDashboard = () => {
               </div>
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base"
               >
-                <LogOut className="w-5 h-5" />
-                <span>Déconnexion</span>
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Déconnexion</span>
               </button>
             </div>
           </div>
@@ -253,25 +253,26 @@ const ProducerDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-8">
+        <div className="mb-8 overflow-x-auto">
+          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max sm:min-w-0">
             {[
-              { id: 'products', label: 'Mes Produits', icon: Package },
-              { id: 'orders', label: 'Commandes', icon: ShoppingCart },
-              { id: 'chatbot', label: 'Conseiller IA', icon: MessageCircle },
-              { id: 'profile', label: 'Profil', icon: User }
+              { id: 'products', label: 'Mes Produits', icon: Package, shortLabel: 'Produits' },
+              { id: 'orders', label: 'Commandes', icon: ShoppingCart, shortLabel: 'Commandes' },
+              { id: 'chatbot', label: 'Conseiller IA', icon: MessageCircle, shortLabel: 'IA' },
+              { id: 'profile', label: 'Profil', icon: User, shortLabel: 'Profil' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.label}</span>
+                <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
               </button>
             ))}
           </nav>
@@ -282,8 +283,8 @@ const ProducerDashboard = () => {
           {/* Products Tab */}
           {activeTab === 'products' && (
             <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                   Mes Produits ({filteredProducts.length} sur {products.length})
                 </h2>
                 <button
@@ -291,10 +292,10 @@ const ProducerDashboard = () => {
                     setEditingProduct(null);
                     setShowProductForm(true);
                   }}
-                  className="btn-primary flex items-center space-x-2"
+                  className="btn-primary flex items-center space-x-2 w-full sm:w-auto justify-center"
                 >
-                  <Plus className="w-5 h-5" />
-                  <span>Ajouter un produit</span>
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-sm sm:text-base">Ajouter un produit</span>
                 </button>
               </div>
 
@@ -309,7 +310,7 @@ const ProducerDashboard = () => {
                       onClear={clearProductSearch}
                     />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <FilterDropdown
                       label="Catégorie"
                       options={productFilterConfig.filters[0].options}
@@ -368,7 +369,7 @@ const ProducerDashboard = () => {
                   </button>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredProducts.map((product) => (
                     <div key={product._id} className="card">
                       {product.image && (
@@ -409,13 +410,13 @@ const ProducerDashboard = () => {
                           </p>
                         )}
                         
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <button
                             onClick={() => {
                               setEditingProduct(product);
                               setShowProductForm(true);
                             }}
-                            className="flex-1 btn-outline text-sm"
+                            className="flex-1 btn-outline text-sm flex items-center justify-center"
                           >
                             <Edit className="w-4 h-4 mr-1" />
                             Modifier

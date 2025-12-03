@@ -52,31 +52,31 @@ const LandingPage = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
             <div className="flex items-center space-x-2">
-              <Leaf className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold text-gray-900">AgriConnect</span>
+              <Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
+              <span className="text-xl sm:text-2xl font-bold text-gray-900">AgriConnect</span>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4 w-full sm:w-auto">
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4 w-full sm:w-auto">
+                  <span className="text-sm sm:text-base text-gray-700">
                     Bonjour, {user?.firstName} !
                   </span>
                   <Link
                     to={user?.role === 'PRODUCER' ? '/dashboard' : '/merchant'}
-                    className="btn-primary"
+                    className="btn-primary w-full sm:w-auto text-center"
                   >
                     Mon Tableau de Bord
                   </Link>
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-700 hover:text-primary-600">
+                  <Link to="/login" className="text-gray-700 hover:text-primary-600 text-sm sm:text-base w-full sm:w-auto text-center sm:text-left">
                     Connexion
                   </Link>
-                  <Link to="/register" className="btn-primary">
+                  <Link to="/register" className="btn-primary w-full sm:w-auto text-center">
                     S'inscrire
                   </Link>
                 </>

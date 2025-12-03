@@ -147,7 +147,7 @@ const Register = () => {
             {/* Role Selection */}
             <div>
               <label className="label">Je suis un :</label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label className="relative">
                   <input
                     type="radio"

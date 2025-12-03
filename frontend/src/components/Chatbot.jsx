@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Send, Plus, Trash2, Bot, User } from 'lucide-react';
+import { MessageCircle, Send, Plus, Trash2, Bot, User, Menu, X } from 'lucide-react';
 import { chatbotService } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -7,6 +7,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -215,21 +216,30 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   };
 
   return (
-    <div className="h-[600px] flex bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="h-[600px] flex flex-col sm:flex-row bg-white rounded-xl shadow-sm border border-gray-200 relative">
       {/* Sidebar - Conversations */}
-      <div className="w-80 border-r border-gray-200 flex flex-col">
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 border-r border-gray-200 flex-col absolute sm:relative z-10 bg-white h-full`}>
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               Conversations
             </h3>
-            <button
-              onClick={handleCreateConversation}
-              className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
-              title="Nouvelle conversation"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCreateConversation}
+                className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+                title="Nouvelle conversation"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setShowSidebar(false)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg sm:hidden"
+                title="Fermer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -283,13 +293,22 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
         {selectedConversation ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {selectedConversation.title}
-              </h3>
-              <p className="text-sm text-gray-600">
-                Conseiller agricole IA spécialisé Burkina Faso
-              </p>
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                  {selectedConversation.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Conseiller agricole IA spécialisé Burkina Faso
+                </p>
+              </div>
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg sm:hidden"
+                title="Ouvrir les conversations"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Messages */}
@@ -327,7 +346,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg ${
                         message.role === 'user'
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-900'
@@ -371,23 +390,23 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
 
             {/* Message Input */}
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-2 sm:p-4 border-t border-gray-200">
               <div className="flex space-x-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Posez votre question sur l'agriculture..."
-                  className="flex-1 input-field"
+                  placeholder="Posez votre question..."
+                  className="flex-1 input-field text-sm sm:text-base"
                   disabled={isStreaming}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || isStreaming}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed p-2 sm:px-4"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>

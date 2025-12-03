@@ -216,24 +216,25 @@ const MerchantDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-8">
+        <div className="mb-8 overflow-x-auto">
+          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max sm:min-w-0">
             {[
-              { id: 'producers', label: 'Producteurs', icon: Users },
-              { id: 'orders', label: 'Mes Commandes', icon: ShoppingCart },
-              { id: 'profile', label: 'Profil', icon: User }
+              { id: 'producers', label: 'Producteurs', icon: Users, shortLabel: 'Producteurs' },
+              { id: 'orders', label: 'Mes Commandes', icon: ShoppingCart, shortLabel: 'Commandes' },
+              { id: 'profile', label: 'Profil', icon: User, shortLabel: 'Profil' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.label}</span>
+                <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
               </button>
             ))}
           </nav>
@@ -244,7 +245,7 @@ const MerchantDashboard = () => {
           {/* Producers Tab */}
           {activeTab === 'producers' && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">
                 Producteurs Disponibles ({filteredProducers.length} sur {producers.length})
               </h2>
 
@@ -259,7 +260,7 @@ const MerchantDashboard = () => {
                       onClear={clearProducerSearch}
                     />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <FilterDropdown
                       label="Localisation"
                       options={producerFilterConfig.filters[0].options}
@@ -305,9 +306,9 @@ const MerchantDashboard = () => {
                   </button>
                 </div>
               ) : (
-                <div className="grid lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                   {/* Producers List */}
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 order-2 lg:order-1">
                     <div className="space-y-4">
                       {filteredProducers.map((producer) => (
                         <div
@@ -341,16 +342,16 @@ const MerchantDashboard = () => {
                   </div>
 
                   {/* Producer Products */}
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-2 order-1 lg:order-2">
                     {selectedProducer ? (
                       <div>
-                        <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-lg font-semibold text-gray-900">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                             Produits de {selectedProducer.firstName} {selectedProducer.lastName}
                           </h3>
                           <button
                             onClick={() => handleWhatsAppContact(selectedProducer.phone, selectedProducer.firstName)}
-                            className="btn-secondary flex items-center space-x-2"
+                            className="btn-secondary flex items-center space-x-2 w-full sm:w-auto justify-center"
                           >
                             <MessageCircle className="w-4 h-4" />
                             <span>WhatsApp</span>
@@ -368,7 +369,7 @@ const MerchantDashboard = () => {
                             </p>
                           </div>
                         ) : (
-                          <div className="grid md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {producerProducts.map((product) => (
                               <div key={product._id} className="card">
                                 {product.image && (
@@ -482,7 +483,7 @@ const MerchantDashboard = () => {
                       Informations personnelles
                     </h3>
                     <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="label">Prénom</label>
                       <p className="text-gray-900">{user?.firstName}</p>
