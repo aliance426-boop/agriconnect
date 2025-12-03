@@ -500,11 +500,22 @@ const MerchantDashboard = () => {
 
           {/* Orders Tab */}
           {activeTab === 'orders' && (
-            <OrdersList 
-              orders={orders} 
-              onStatusUpdate={() => {}} // Merchants can't update order status
-              userRole="MERCHANT"
-            />
+            <>
+              <OrdersList 
+                orders={orders} 
+                onStatusUpdate={() => {}} // Merchants can't update order status
+                userRole="MERCHANT"
+              />
+              {ordersPagination.totalPages > 1 && (
+                <Pagination
+                  currentPage={ordersPagination.currentPage}
+                  totalPages={ordersPagination.totalPages}
+                  totalItems={ordersPagination.totalItems}
+                  itemsPerPage={ordersPagination.itemsPerPage}
+                  onPageChange={handleOrdersPageChange}
+                />
+              )}
+            </>
           )}
 
           {/* Profile Tab */}
