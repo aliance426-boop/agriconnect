@@ -134,7 +134,7 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
   if (filteredOrders.length === 0) {
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Commandes ({filteredOrders.length} sur {orders.length})
         </h2>
 
@@ -149,7 +149,7 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
                 onClear={clearOrderSearch}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <FilterDropdown
                 label="Statut"
                 options={orderFilterConfig.filters[0].options}
@@ -260,28 +260,28 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
       <div className="space-y-4">
         {filteredOrders.map((order) => (
           <div key={order._id} className="card">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <Package className="w-6 h-6 text-primary-600" />
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+              <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                     {order.productId?.title}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     {order.productId?.category}
                   </p>
                 </div>
               </div>
               
-              <div className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+              <div className={`inline-flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(order.status)} flex-shrink-0`}>
                 {getStatusIcon(order.status)}
                 <span>{getStatusText(order.status)}</span>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Order Details */}
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -358,17 +358,17 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
 
             {/* Action Buttons for Producer */}
             {userRole === 'PRODUCER' && order.status === 'PENDING' && (
-              <div className="flex space-x-3 mt-4 pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-3 mt-4 pt-4 border-t">
                 <button
                   onClick={() => onStatusUpdate(order._id, 'ACCEPTED')}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm sm:text-base"
                 >
                   <CheckCircle className="w-4 h-4" />
                   <span>Accepter</span>
                 </button>
                 <button
                   onClick={() => onStatusUpdate(order._id, 'REFUSED')}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2"
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm sm:text-base"
                 >
                   <XCircle className="w-4 h-4" />
                   <span>Refuser</span>
@@ -382,7 +382,7 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
                 href={`https://wa.me/${userRole === 'PRODUCER' ? order.merchantId?.phone?.replace(/\D/g, '') : order.producerId?.phone?.replace(/\D/g, '')}?text=Bonjour, je vous contacte concernant la commande de ${order.productId?.title}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2"
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm sm:text-base"
               >
                 <span>📱</span>
                 <span>Contacter sur WhatsApp</span>

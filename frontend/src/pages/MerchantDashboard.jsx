@@ -187,16 +187,16 @@ const MerchantDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                 Tableau de Bord Commerçant
               </h1>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
               <UserAvatar user={user} size="md" />
-              <div className="text-right">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium text-gray-900">
                   {user?.firstName} {user?.lastName}
                 </p>
@@ -204,10 +204,10 @@ const MerchantDashboard = () => {
               </div>
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base"
               >
-                <LogOut className="w-5 h-5" />
-                <span>Déconnexion</span>
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Déconnexion</span>
               </button>
             </div>
           </div>
@@ -320,19 +320,19 @@ const MerchantDashboard = () => {
                           }`}
                           onClick={() => handleProducerSelect(producer)}
                         >
-                          <div className="flex items-start space-x-3">
+                          <div className="flex items-start space-x-2 sm:space-x-3">
                             <UserAvatar user={producer} size="md" />
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900">
+                              <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                                 {producer.firstName} {producer.lastName}
                               </h3>
-                              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                                <MapPin className="w-4 h-4" />
-                                <span>{producer.location}</span>
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mt-1">
+                                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">{producer.location}</span>
                               </div>
-                              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                                <Phone className="w-4 h-4" />
-                                <span>{producer.phone}</span>
+                              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mt-1">
+                                <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">{producer.phone}</span>
                               </div>
                             </div>
                           </div>
@@ -392,12 +392,12 @@ const MerchantDashboard = () => {
                                     </p>
                                   </div>
                                   
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-xl font-bold text-primary-600">
+                                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    <span className="text-lg sm:text-xl font-bold text-primary-600">
                                       {product.price} FCFA
                                     </span>
-                                    <div className="flex flex-col items-end space-y-1">
-                                      <span className="text-sm text-gray-600">
+                                    <div className="flex flex-col items-start sm:items-end space-y-1">
+                                      <span className="text-xs sm:text-sm text-gray-600">
                                         Stock: {product.quantity}
                                       </span>
                                       <StockIndicator quantity={product.quantity} />
@@ -459,7 +459,7 @@ const MerchantDashboard = () => {
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="max-w-2xl">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">
                 Mon Profil
               </h2>
               <div className="card">
