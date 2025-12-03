@@ -224,13 +224,14 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
               onClear={clearOrderSearch}
             />
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <FilterDropdown
               label="Statut"
               options={orderFilterConfig.filters[0].options}
               value={orderFilters.status || 'all'}
               onChange={(value) => updateOrderFilter('status', value)}
               placeholder="Tous les statuts"
+              className="w-full sm:w-auto sm:min-w-[140px]"
             />
             <FilterDropdown
               label="Période"
@@ -238,6 +239,7 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
               value={orderFilters.dateRange || 'all'}
               onChange={(value) => updateOrderFilter('dateRange', value)}
               placeholder="Toutes les périodes"
+              className="w-full sm:w-auto sm:min-w-[150px]"
             />
             <FilterDropdown
               label="Montant"
@@ -245,6 +247,7 @@ const OrdersList = ({ orders, onStatusUpdate, userRole }) => {
               value={orderFilters.amountRange || 'all'}
               onChange={(value) => updateOrderFilter('amountRange', value)}
               placeholder="Tous les montants"
+              className="w-full sm:w-auto sm:min-w-[160px]"
             />
           </div>
         </div>
