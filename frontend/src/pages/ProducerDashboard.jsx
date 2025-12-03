@@ -481,7 +481,7 @@ const ProducerDashboard = () => {
                       Informations personnelles
                     </h3>
                     <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="label">Prénom</label>
                       <p className="text-gray-900">{user?.firstName}</p>
