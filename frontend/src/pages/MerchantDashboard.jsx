@@ -40,6 +40,8 @@ const MerchantDashboard = () => {
   const [favorites, setFavorites] = useState([]);
   const [selectedProducer, setSelectedProducer] = useState(null);
   const [producerProducts, setProducerProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [productsCache, setProductsCache] = useState({}); // Cache pour les produits
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showOrderForm, setShowOrderForm] = useState(false);
@@ -182,19 +184,33 @@ const MerchantDashboard = () => {
   };
 
   const loadProducerProducts = async (producerId) => {
+    // Vérifier le cache d'abord
+    if (productsCache[producerId]) {
+      setProducerProducts(productsCache[producerId]);
+      return;
+    }
+
+    setLoadingProducts(true);
     try {
       const response = await productService.getAll({ producerId });
       // Gérer la réponse paginée ou non paginée
+      let products = [];
       if (response.data.products) {
-        setProducerProducts(response.data.products);
+        products = response.data.products;
       } else {
         // Rétrocompatibilité si pas de pagination (tableau direct)
-        setProducerProducts(response.data);
+        products = Array.isArray(response.data) ? response.data : [];
       }
+      
+      setProducerProducts(products);
+      // Mettre en cache
+      setProductsCache(prev => ({ ...prev, [producerId]: products }));
     } catch (error) {
       console.error('Erreur lors du chargement des produits:', error);
       toast.error('Erreur lors du chargement des produits');
       setProducerProducts([]);
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
@@ -207,6 +223,8 @@ const MerchantDashboard = () => {
 
   const handleProducerSelect = (producer) => {
     setSelectedProducer(producer);
+    // Réinitialiser les produits avant de charger
+    setProducerProducts([]);
     loadProducerProducts(producer._id);
   };
 
@@ -431,13 +449,20 @@ const MerchantDashboard = () => {
                           </button>
                         </div>
 
-                        {producerProducts.length === 0 ? (
+                        {loadingProducts ? (
+                          <div className="card text-center py-12">
+                            <div className="flex flex-col items-center justify-center">
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+                              <p className="text-gray-600 dark:text-gray-400">Chargement des produits...</p>
+                            </div>
+                          </div>
+                        ) : producerProducts.length === 0 ? (
                           <div className="card text-center py-12">
                             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <h4 className="text-lg font-medium text-gray-900 mb-2">
+                            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                               Aucun produit
                             </h4>
-                            <p className="text-gray-600">
+                            <p className="text-gray-600 dark:text-gray-400">
                               Ce producteur n'a pas encore publié de produits
                             </p>
                           </div>
@@ -457,20 +482,20 @@ const MerchantDashboard = () => {
                                 
                                 <div className="space-y-3">
                                   <div>
-                                    <h4 className="font-semibold text-gray-900">
+                                    <h4 className="font-semibold text-gray-900 dark:text-white">
                                       {product.title}
                                     </h4>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
                                       {product.category}
                                     </p>
                                   </div>
                                   
                                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                    <span className="text-lg sm:text-xl font-bold text-primary-600">
+                                    <span className="text-lg sm:text-xl font-bold text-primary-600 dark:text-primary-400">
                                       {product.price} FCFA
                                     </span>
                                     <div className="flex flex-col items-start sm:items-end space-y-1">
-                                      <span className="text-xs sm:text-sm text-gray-600">
+                                      <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                         Stock: {product.quantity}
                                       </span>
                                       <StockIndicator quantity={product.quantity} />
@@ -478,7 +503,7 @@ const MerchantDashboard = () => {
                                   </div>
                                   
                                   {product.description && (
-                                    <p className="text-sm text-gray-600 line-clamp-2">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                                       {product.description}
                                     </p>
                                   )}
@@ -600,7 +625,14 @@ const MerchantDashboard = () => {
                           </button>
                         </div>
 
-                        {producerProducts.length === 0 ? (
+                        {loadingProducts ? (
+                          <div className="card text-center py-12">
+                            <div className="flex flex-col items-center justify-center">
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+                              <p className="text-gray-600 dark:text-gray-400">Chargement des produits...</p>
+                            </div>
+                          </div>
+                        ) : producerProducts.length === 0 ? (
                           <div className="card text-center py-12">
                             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">

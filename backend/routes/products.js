@@ -20,12 +20,16 @@ router.get('/', async (req, res) => {
     if (category) filter.category = category;
     if (producerId) filter.producerId = producerId;
 
+    // Si on filtre par producerId, pas besoin de populate (on a déjà les infos)
+    // Sinon, on populate pour avoir les infos du producteur
+    const query = Product.find(filter).sort({ createdAt: -1 });
+    
+    if (!producerId) {
+      query.populate('producerId', 'firstName lastName phone location companyName');
+    }
+
     const [products, total] = await Promise.all([
-      Product.find(filter)
-        .populate('producerId', 'firstName lastName phone location companyName')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
+      query.skip(skip).limit(limit).lean(), // .lean() pour des performances meilleures
       Product.countDocuments(filter)
     ]);
 
