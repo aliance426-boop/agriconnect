@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const { optimizeImage } = require('./imageOptimizer');
 
 // Configuration du stockage
 const storage = multer.diskStorage({
@@ -29,5 +30,25 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-module.exports = upload;
+// Middleware pour optimiser les images après upload
+const optimizeUploadedImage = async (req, res, next) => {
+  if (req.file) {
+    try {
+      const imagePath = req.file.path;
+      // Optimiser l'image : max 1920x1920, qualité 85%
+      await optimizeImage(imagePath, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 85,
+        format: 'auto'
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'optimisation de l\'image:', error);
+      // Continuer même en cas d'erreur d'optimisation
+    }
+  }
+  next();
+};
+
+module.exports = { upload, optimizeUploadedImage };
 

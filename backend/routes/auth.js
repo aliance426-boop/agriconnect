@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, optimizeUploadedImage } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ const generateToken = (userId) => {
 // @route   POST /api/auth/register
 // @desc    Inscription d'un nouvel utilisateur
 // @access  Public
-router.post('/register', upload.single('profileImage'), [
+router.post('/register', upload.single('profileImage'), optimizeUploadedImage, [
   body('firstName').trim().notEmpty().withMessage('Le prénom est requis'),
   body('lastName').trim().notEmpty().withMessage('Le nom est requis'),
   body('email').isEmail().normalizeEmail().withMessage('Email invalide'),

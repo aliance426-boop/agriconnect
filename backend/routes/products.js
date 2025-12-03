@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Product = require('../models/Product');
 const { auth, requireRole } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, optimizeUploadedImage } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -85,7 +85,7 @@ router.get('/my-products', auth, requireRole(['PRODUCER']), async (req, res) => 
 // @route   POST /api/products
 // @desc    Créer un nouveau produit
 // @access  Private (Producteur seulement)
-router.post('/', auth, requireRole(['PRODUCER']), upload.single('image'), [
+router.post('/', auth, requireRole(['PRODUCER']), upload.single('image'), optimizeUploadedImage, [
   body('title').trim().notEmpty().withMessage('Le titre est requis'),
   body('price').isNumeric().withMessage('Le prix doit être un nombre'),
   body('quantity').isInt({ min: 1 }).withMessage('La quantité doit être un entier positif'),
@@ -126,7 +126,7 @@ router.post('/', auth, requireRole(['PRODUCER']), upload.single('image'), [
 // @route   PUT /api/products/:id
 // @desc    Modifier un produit
 // @access  Private (Producteur propriétaire seulement)
-router.put('/:id', auth, requireRole(['PRODUCER']), upload.single('image'), async (req, res) => {
+router.put('/:id', auth, requireRole(['PRODUCER']), upload.single('image'), optimizeUploadedImage, async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id, producerId: req.user._id });
     

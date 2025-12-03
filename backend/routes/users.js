@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { auth, requireRole } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, optimizeUploadedImage } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -115,7 +115,7 @@ router.put('/profile', auth, [
 // @route   POST /api/users/profile-image
 // @desc    Upload une photo de profil
 // @access  Private
-router.post('/profile-image', auth, upload.single('profileImage'), async (req, res) => {
+router.post('/profile-image', auth, upload.single('profileImage'), optimizeUploadedImage, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Aucune image fournie' });
