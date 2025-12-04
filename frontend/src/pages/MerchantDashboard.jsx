@@ -284,10 +284,10 @@ const MerchantDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-x-hidden overscroll-x-none" style={{ touchAction: 'pan-y pinch-zoom', maxWidth: '100vw' }}>
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ touchAction: 'none' }}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
             <div className="flex items-center space-x-2 sm:space-x-4">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
@@ -316,10 +316,10 @@ const MerchantDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden" style={{ touchAction: 'pan-y pinch-zoom' }}>
         {/* Navigation Tabs */}
-        <div className="mb-8 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide">
-          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max">
+        <div className="mb-8 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide" style={{ touchAction: 'pan-x', overscrollBehaviorX: 'none', overscrollBehaviorY: 'none' }}>
+          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max" style={{ touchAction: 'pan-x' }}>
             {[
               { id: 'producers', label: 'Producteurs', icon: Users },
               { id: 'favorites', label: 'Favoris', icon: Heart },

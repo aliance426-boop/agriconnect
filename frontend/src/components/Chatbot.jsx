@@ -216,25 +216,25 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   };
 
   return (
-    <div className="h-[600px] flex flex-col sm:flex-row bg-white rounded-xl shadow-sm border border-gray-200 relative">
+    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
       {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 border-r border-gray-200 flex-col absolute sm:relative z-10 bg-white h-full`}>
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`} style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
+        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Conversations
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCreateConversation}
-                className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+                className="p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                 title="Nouvelle conversation"
               >
                 <Plus className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setShowSidebar(false)}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg sm:hidden"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg sm:hidden transition-colors"
                 title="Fermer"
               >
                 <X className="w-5 h-5" />
@@ -243,32 +243,35 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
           {conversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-              <p>Aucune conversation</p>
-              <p className="text-sm">Créez votre première conversation</p>
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+              <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm sm:text-base">Aucune conversation</p>
+              <p className="text-xs sm:text-sm">Créez votre première conversation</p>
             </div>
           ) : (
             <div className="space-y-1 p-2">
               {conversations.map((conversation) => (
                 <div
                   key={conversation._id}
-                  onClick={() => setSelectedConversation(conversation)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  onClick={() => {
+                    setSelectedConversation(conversation);
+                    setShowSidebar(false);
+                  }}
+                  className={`p-2.5 sm:p-3 rounded-lg cursor-pointer transition-colors ${
                     selectedConversation?._id === conversation._id
-                      ? 'bg-primary-50 border border-primary-200'
-                      : 'hover:bg-gray-50'
+                      ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
+                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                         {conversation.title}
                       </h4>
-                      <p className="text-xs text-gray-500">
-                        {conversation.messages.length} messages
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {conversation.messages.length} message{conversation.messages.length > 1 ? 's' : ''}
                       </p>
                     </div>
                     <button
@@ -276,7 +279,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                         e.stopPropagation();
                         handleDeleteConversation(conversation._id);
                       }}
-                      className="p-1 text-gray-400 hover:text-red-600"
+                      className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -289,22 +292,22 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
         {selectedConversation ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex-1">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+            <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-white dark:bg-gray-800">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white truncate">
                   {selectedConversation.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                   Conseiller agricole IA spécialisé Burkina Faso
                 </p>
               </div>
               <button
                 onClick={() => setShowSidebar(true)}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg sm:hidden"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg sm:hidden ml-2 flex-shrink-0"
                 title="Ouvrir les conversations"
               >
                 <Menu className="w-5 h-5" />
@@ -312,26 +315,26 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800">
               {selectedConversation.messages.length === 0 ? (
-                <div className="text-center py-8">
-                  <Bot className="w-16 h-16 text-primary-400 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">
+                <div className="text-center py-4 sm:py-8 px-2">
+                  <Bot className="w-12 h-12 sm:w-16 sm:h-16 text-primary-400 mx-auto mb-3 sm:mb-4" />
+                  <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
                     Bienvenue dans votre conseiller IA !
                   </h4>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 px-2">
                     Posez vos questions sur l'agriculture au Burkina Faso
                   </p>
                   
                   {/* Quick Questions */}
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">Questions rapides :</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="space-y-2 px-2">
+                    <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Questions rapides :</p>
+                    <div className="flex flex-wrap gap-2 justify-center">
                       {quickQuestions.map((question, index) => (
                         <button
                           key={index}
                           onClick={() => handleQuickQuestion(question)}
-                          className="text-xs bg-primary-50 text-primary-700 px-3 py-1 rounded-full hover:bg-primary-100 transition-colors"
+                          className="text-xs bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-2 sm:px-3 py-1.5 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors break-words max-w-full"
                         >
                           {question}
                         </button>
@@ -343,24 +346,24 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                 selectedConversation.messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} px-1 sm:px-0`}
                   >
                     <div
-                      className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg ${
+                      className={`max-w-[90%] xs:max-w-[85%] sm:max-w-xs md:max-w-md lg:max-w-lg px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg break-words ${
                         message.role === 'user'
                           ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                          : 'bg-white text-gray-900'
                       }`}
                     >
                       <div className="flex items-start space-x-2">
                         {message.role === 'ai' && (
-                          <Bot className="w-4 h-4 text-primary-600 mt-1 flex-shrink-0" />
+                          <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 mt-0.5 sm:mt-1 flex-shrink-0" />
                         )}
                         {message.role === 'user' && (
-                          <User className="w-4 h-4 text-white mt-1 flex-shrink-0" />
+                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-white mt-0.5 sm:mt-1 flex-shrink-0" />
                         )}
-                        <div className="flex-1">
-                          <p className="text-sm whitespace-pre-wrap">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">
                             {message.content}
                             {message.streaming && !message.content && (
                               <span className="inline-flex space-x-1">
@@ -370,8 +373,8 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                               </span>
                             )}
                           </p>
-                          {!message.streaming && (
-                            <p className={`text-xs mt-1 ${
+                          {!message.streaming && message.content && (
+                            <p className={`text-xs mt-1.5 sm:mt-2 ${
                               message.role === 'user' ? 'text-primary-100' : 'text-gray-500'
                             }`}>
                               {new Date(message.timestamp).toLocaleTimeString('fr-FR', {
@@ -390,7 +393,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
 
             {/* Message Input */}
-            <div className="p-2 sm:p-4 border-t border-gray-200">
+            <div className="p-2 sm:p-3 md:p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
               <div className="flex space-x-2">
                 <input
                   type="text"
@@ -398,13 +401,13 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Posez votre question..."
-                  className="flex-1 input-field text-sm sm:text-base"
+                  className="flex-1 input-field text-sm sm:text-base min-w-0"
                   disabled={isStreaming}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || isStreaming}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed p-2 sm:px-4"
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed p-2 sm:px-4 flex-shrink-0"
                 >
                   <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -412,13 +415,13 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center p-4 bg-white dark:bg-gray-800">
             <div className="text-center">
-              <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <MessageCircle className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 dark:text-gray-600 mx-auto mb-3 sm:mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Sélectionnez une conversation
               </h3>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Ou créez une nouvelle conversation pour commencer
               </p>
             </div>
