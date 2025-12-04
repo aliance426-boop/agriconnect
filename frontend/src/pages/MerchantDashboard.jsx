@@ -137,6 +137,15 @@ const MerchantDashboard = () => {
     };
   }, [selectedProducer]);
 
+  const loadFavorites = async () => {
+    try {
+      const favoritesData = await favoriteService.getFavorites().catch(() => ({ data: [] }));
+      setFavorites(favoritesData.data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des favoris:', error);
+    }
+  };
+
   const loadData = async (producersPage = 1, ordersPage = 1) => {
     try {
       setLoading(true);
@@ -401,7 +410,10 @@ const MerchantDashboard = () => {
                                 <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
                                   {producer.firstName} {producer.lastName}
                                 </h3>
-                                <FavoriteButton producerId={producer._id} />
+                                <FavoriteButton 
+                                  producerId={producer._id} 
+                                  onToggle={loadFavorites}
+                                />
                               </div>
                               <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />

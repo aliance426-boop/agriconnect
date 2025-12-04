@@ -35,7 +35,13 @@ const FavoriteButton = ({ producerId, onToggle }) => {
         setIsFavorite(true);
         toast.success('Ajouté aux favoris');
       }
-      if (onToggle) onToggle();
+      // Appeler le callback pour mettre à jour la liste des favoris
+      if (onToggle) {
+        // Petit délai pour s'assurer que le serveur a bien enregistré
+        setTimeout(() => {
+          onToggle();
+        }, 100);
+      }
     } catch (error) {
       console.error('Erreur lors de la modification du favori:', error);
       toast.error('Erreur lors de la modification');
