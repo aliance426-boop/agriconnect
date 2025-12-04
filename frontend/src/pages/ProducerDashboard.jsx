@@ -297,23 +297,23 @@ const ProducerDashboard = () => {
         <div className="mb-8 overflow-x-auto">
           <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max sm:min-w-0">
             {[
-              { id: 'products', label: 'Mes Produits', icon: Package, shortLabel: 'Produits' },
-              { id: 'orders', label: 'Commandes', icon: ShoppingCart, shortLabel: 'Commandes' },
+              { id: 'products', label: 'Mes Produits', icon: Package, shortLabel: 'Prod.' },
+              { id: 'orders', label: 'Commandes', icon: ShoppingCart, shortLabel: 'Cmd.' },
               { id: 'chatbot', label: 'Conseiller IA', icon: MessageCircle, shortLabel: 'IA' },
               { id: 'profile', label: 'Profil', icon: User, shortLabel: 'Profil' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                   activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
-                <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <tab.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.shortLabel}</span>
+                <span className="sm:hidden min-w-[3rem] text-left">{tab.shortLabel}</span>
               </button>
             ))}
           </nav>
