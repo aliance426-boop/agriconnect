@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import { favoriteService } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -56,12 +56,12 @@ const FavoriteButton = ({ producerId, onToggle }) => {
       disabled={loading}
       className={`p-2 rounded-lg transition-all duration-200 ${
         isFavorite
-          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+          ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
           : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
       }`}
       title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
     >
-      <Heart 
+      <ThumbsUp 
         className={`w-4 h-4 sm:w-5 sm:h-5 transition-all duration-200 ${
           isFavorite ? 'fill-current' : ''
         }`}

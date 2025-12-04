@@ -11,7 +11,7 @@ import {
   MapPin,
   MessageCircle,
   Eye,
-  Heart
+  ThumbsUp
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -322,7 +322,7 @@ const MerchantDashboard = () => {
           <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max" style={{ touchAction: 'pan-x' }}>
             {[
               { id: 'producers', label: 'Producteurs', icon: Users },
-              { id: 'favorites', label: 'Favoris', icon: Heart },
+              { id: 'favorites', label: 'Favoris', icon: ThumbsUp },
               { id: 'orders', label: 'Mes Commandes', icon: ShoppingCart },
               { id: 'profile', label: 'Profil', icon: User }
             ].map((tab) => (
@@ -585,7 +585,7 @@ const MerchantDashboard = () => {
 
               {favorites.length === 0 ? (
                 <div className="card text-center py-12 animate-fade-in">
-                  <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <ThumbsUp className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     Aucun favori
                   </h3>

@@ -157,21 +157,6 @@ const Login = () => {
             </div>
           </form>
         </div>
-
-        {/* Demo Accounts */}
-        <div className="card bg-gray-50">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-            Comptes de démonstration
-          </h3>
-          <div className="space-y-2 text-sm">
-            <div>
-              <strong>Producteur :</strong> producteur@demo.com / demo123
-            </div>
-            <div>
-              <strong>Commerçant :</strong> commercant@demo.com / demo123
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
