@@ -598,7 +598,7 @@ const MerchantDashboard = () => {
                                 <FavoriteButton 
                                   producerId={producer._id} 
                                   onToggle={() => {
-                                    setFavorites(favorites.filter(f => f._id !== producer._id));
+                                    loadFavorites();
                                     if (selectedProducer?._id === producer._id) {
                                       setSelectedProducer(null);
                                       setProducerProducts([]);
