@@ -96,6 +96,13 @@ const MerchantDashboard = () => {
     const handleProductDeleted = (event) => {
       const { productId, producerId } = event.detail;
       
+      // Invalider le cache pour ce producteur
+      setProductsCache(prev => {
+        const newCache = { ...prev };
+        delete newCache[producerId]; // Supprimer complètement le cache pour forcer le rechargement
+        return newCache;
+      });
+      
       // Si c'est un produit du producteur sélectionné, mettre à jour la liste
       if (selectedProducer && selectedProducer._id === producerId) {
         setProducerProducts(prevProducts => 
@@ -108,11 +115,16 @@ const MerchantDashboard = () => {
     const handleProductUpdated = (event) => {
       const { product, producerId } = event.detail;
       
-      // Si c'est un produit du producteur sélectionné, mettre à jour la liste
+      // Invalider le cache pour ce producteur
+      setProductsCache(prev => {
+        const newCache = { ...prev };
+        delete newCache[producerId]; // Supprimer complètement le cache pour forcer le rechargement
+        return newCache;
+      });
+      
+      // Si c'est un produit du producteur sélectionné, recharger les produits
       if (selectedProducer && selectedProducer._id === producerId) {
-        setProducerProducts(prevProducts => 
-          prevProducts.map(p => p._id === product._id ? product : p)
-        );
+        loadProducerProducts(producerId, true); // Force refresh
       }
     };
     
@@ -120,9 +132,16 @@ const MerchantDashboard = () => {
     const handleProductCreated = (event) => {
       const { product, producerId } = event.detail;
       
-      // Si c'est un produit du producteur sélectionné, ajouter à la liste
+      // Invalider le cache pour ce producteur
+      setProductsCache(prev => {
+        const newCache = { ...prev };
+        delete newCache[producerId]; // Supprimer complètement le cache pour forcer le rechargement
+        return newCache;
+      });
+      
+      // Si c'est un produit du producteur sélectionné, recharger les produits
       if (selectedProducer && selectedProducer._id === producerId) {
-        setProducerProducts(prevProducts => [product, ...prevProducts]);
+        loadProducerProducts(producerId, true); // Force refresh
       }
     };
     
