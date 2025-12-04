@@ -192,9 +192,9 @@ const MerchantDashboard = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const loadProducerProducts = async (producerId) => {
-    // Vérifier le cache d'abord
-    if (productsCache[producerId]) {
+  const loadProducerProducts = async (producerId, forceRefresh = false) => {
+    // Vérifier le cache seulement si pas de force refresh
+    if (!forceRefresh && productsCache[producerId]) {
       setProducerProducts(productsCache[producerId]);
       return;
     }
@@ -234,7 +234,8 @@ const MerchantDashboard = () => {
     setSelectedProducer(producer);
     // Réinitialiser les produits avant de charger
     setProducerProducts([]);
-    loadProducerProducts(producer._id);
+    // Toujours forcer le rechargement pour avoir les données les plus récentes
+    loadProducerProducts(producer._id, true);
   };
 
   const handleOrderSubmit = async (orderData) => {
