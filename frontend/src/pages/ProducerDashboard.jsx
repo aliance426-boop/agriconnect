@@ -499,7 +499,7 @@ const ProducerDashboard = () => {
 
           {/* Chatbot Tab */}
           {activeTab === 'chatbot' && (
-            <div className="w-full -mx-4 sm:mx-0 px-2 sm:px-0 overflow-x-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+            <div className="w-full -mx-4 sm:mx-0 px-2 sm:px-0 overflow-x-hidden" style={{ touchAction: 'pan-y', overscrollBehaviorX: 'none' }}>
               <Chatbot 
                 conversations={conversations}
                 onConversationUpdate={reloadConversations}

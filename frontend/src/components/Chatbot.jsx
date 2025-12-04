@@ -216,9 +216,9 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   };
 
   return (
-    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
       {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`} style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`} style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
@@ -244,12 +244,24 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
         </div>
 
         <div 
-          className="flex-1 overflow-y-auto scrollbar-hide"
-          style={{ 
-            touchAction: 'pan-y',
-            overscrollBehaviorY: 'contain',
-            overscrollBehaviorX: 'none',
-            WebkitOverflowScrolling: 'touch'
+          className="flex-1 overflow-y-auto scrollbar-hide chatbot-scroll-area"
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            // Permettre le scroll
+            const target = e.currentTarget;
+            const scrollTop = target.scrollTop;
+            const scrollHeight = target.scrollHeight;
+            const clientHeight = target.clientHeight;
+            const isAtTop = scrollTop === 0;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            if ((isAtTop && e.touches[0].clientY > e.touches[0].clientY) || 
+                (isAtBottom && e.touches[0].clientY < e.touches[0].clientY)) {
+              // Ne pas empêcher le scroll naturel
+            }
+          }}
+          onTouchMove={(e) => {
+            e.stopPropagation();
           }}
         >
           {conversations.length === 0 ? (
@@ -300,7 +312,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
         {selectedConversation ? (
           <>
             {/* Chat Header */}
@@ -324,12 +336,12 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
 
             {/* Messages */}
             <div 
-              className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800"
-              style={{ 
-                touchAction: 'pan-y',
-                overscrollBehaviorY: 'contain',
-                overscrollBehaviorX: 'none',
-                WebkitOverflowScrolling: 'touch'
+              className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800 chatbot-scroll-area"
+              onTouchStart={(e) => {
+                e.stopPropagation();
+              }}
+              onTouchMove={(e) => {
+                e.stopPropagation();
               }}
             >
               {selectedConversation.messages.length === 0 ? (

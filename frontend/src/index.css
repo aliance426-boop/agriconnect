@@ -213,4 +213,20 @@ nav {
   }
 }
 
+/* Classe spécifique pour le scroll du chatbot */
+.chatbot-scroll-area {
+  touch-action: pan-y !important;
+  overscroll-behavior-y: contain !important;
+  overscroll-behavior-x: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  overflow-y: auto !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Empêcher la propagation des événements touch sur les zones de scroll */
+.chatbot-scroll-area * {
+  touch-action: inherit;
+}
+
 
