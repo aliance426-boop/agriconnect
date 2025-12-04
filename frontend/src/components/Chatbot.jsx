@@ -264,10 +264,15 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
         style={{
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
+          overscrollBehaviorY: 'contain',
+          overscrollBehaviorX: 'none',
           touchAction: 'pan-y',
           minHeight: 0,
           position: 'relative',
-          height: '100%'
+          height: '100%',
+          maxHeight: '100%',
+          overflowY: 'scroll',
+          overflowX: 'hidden'
         }}
       >
         {conversations.length === 0 ? (
@@ -319,7 +324,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   );
 
   return (
-    <div className="chatbot-container h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative">
+    <div className="chatbot-container h-[calc(100vh-200px)] sm:h-[600px] min-h-[500px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative">
       {/* Sidebar Desktop - toujours visible */}
       <div className="hidden sm:flex w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col bg-white dark:bg-gray-800 h-full">
         {sidebarContent}
@@ -340,7 +345,9 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             className="fixed top-0 left-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-800 shadow-xl z-[9999] flex flex-col"
             onClick={(e) => e.stopPropagation()}
             style={{
-              touchAction: 'none'
+              height: '100vh',
+              maxHeight: '100vh',
+              overflow: 'hidden'
             }}
           >
             {sidebarContent}

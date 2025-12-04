@@ -223,13 +223,29 @@ nav {
 
 /* Media query spécifique pour mobile - FORCER LE SCROLL */
 @media (max-width: 640px) {
-  /* Conteneur principal du chatbot - ne pas bloquer */
+  /* Conteneur principal du chatbot - permettre le scroll vertical */
   .chatbot-container {
-    touch-action: none !important;
+    touch-action: pan-y !important;
     overflow: visible !important;
   }
   
-  /* Zones de scroll - permettre uniquement le scroll vertical */
+  /* Zones de scroll dans le portail - FORCER LE SCROLL */
+  body > div[style*="fixed"] > div[style*="overflow-y-scroll"],
+  body > div[style*="fixed"] div[class*="overflow-y-scroll"] {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    overscroll-behavior-x: none !important;
+    overflow-y: scroll !important;
+    position: relative !important;
+    will-change: scroll-position !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+  
+  /* Zones de scroll normales */
   .chatbot-scroll-area,
   div[style*="overflow-y-scroll"],
   div[style*="overflow-y-auto"] {
@@ -244,11 +260,12 @@ nav {
     -webkit-transform: translateZ(0) !important;
   }
   
-  /* Empêcher le body de scroller quand on scroll dans le chatbot */
+  /* Empêcher le body de scroller quand le sidebar est ouvert */
   body.chatbot-open {
     overflow: hidden !important;
     position: fixed !important;
     width: 100% !important;
+    height: 100% !important;
   }
 }
 
