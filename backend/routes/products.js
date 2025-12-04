@@ -102,7 +102,8 @@ router.post('/', auth, requireRole(['PRODUCER']), upload.single('image'), optimi
     }
 
     const { title, price, quantity, category, description } = req.body;
-    const image = req.file ? req.file.filename : '';
+    // Si Cloudinary, utiliser l'URL complète, sinon le filename
+    const image = req.file ? (req.file.cloudinaryUrl || req.file.path || req.file.filename) : '';
 
     const product = new Product({
       title,
