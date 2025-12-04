@@ -294,26 +294,25 @@ const ProducerDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-8 overflow-x-auto">
-          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max sm:min-w-0">
+        <div className="mb-8 overflow-x-auto scrollbar-hide">
+          <nav className="flex space-x-3 sm:space-x-4 md:space-x-8 min-w-max">
             {[
-              { id: 'products', label: 'Mes Produits', icon: Package, shortLabel: 'Prod.' },
-              { id: 'orders', label: 'Commandes', icon: ShoppingCart, shortLabel: 'Cmd.' },
-              { id: 'chatbot', label: 'Conseiller IA', icon: MessageCircle, shortLabel: 'IA' },
-              { id: 'profile', label: 'Profil', icon: User, shortLabel: 'Profil' }
+              { id: 'products', label: 'Mes Produits', icon: Package },
+              { id: 'orders', label: 'Commandes', icon: ShoppingCart },
+              { id: 'chatbot', label: 'Conseiller IA', icon: MessageCircle },
+              { id: 'profile', label: 'Profil', icon: User }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
+                className={`flex items-center space-x-2 py-2 px-3 sm:px-4 border-b-2 font-medium text-sm sm:text-base whitespace-nowrap transition-colors flex-shrink-0 ${
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 <tab.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden min-w-[3rem] text-left">{tab.shortLabel}</span>
+                <span>{tab.label}</span>
               </button>
             ))}
           </nav>
