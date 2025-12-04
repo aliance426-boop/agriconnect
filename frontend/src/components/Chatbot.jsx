@@ -9,6 +9,9 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef(null);
+  const conversationsScrollRef = useRef(null);
+  const sidebarScrollRef = useRef(null);
+  const messagesScrollRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -215,14 +218,25 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
     setNewMessage(question);
   };
 
+  // Gérer le body scroll sur mobile
+  useEffect(() => {
+    if (showSidebar && window.innerWidth <= 640) {
+      document.body.classList.add('chatbot-open');
+    } else {
+      document.body.classList.remove('chatbot-open');
+    }
+    return () => {
+      document.body.classList.remove('chatbot-open');
+    };
+  }, [showSidebar]);
+
   return (
-    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+    <div className="chatbot-container h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative">
       {/* Backdrop pour mobile */}
       {showSidebar && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-10 sm:hidden"
           onClick={() => setShowSidebar(false)}
-          style={{ touchAction: 'none' }}
         />
       )}
       
@@ -260,11 +274,14 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
         </div>
 
         <div 
-          className="flex-1 overflow-y-auto scrollbar-hide chatbot-scroll-area"
+          ref={conversationsScrollRef}
+          className="flex-1 overflow-y-scroll scrollbar-hide"
           style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
             minHeight: 0,
-            maxHeight: '100%',
-            height: '100%'
+            position: 'relative'
           }}
         >
           {conversations.length === 0 ? (
@@ -338,7 +355,16 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800 chatbot-scroll-area">
+            <div 
+              className="flex-1 overflow-y-scroll p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+                minHeight: 0,
+                position: 'relative'
+              }}
+            >
               {selectedConversation.messages.length === 0 ? (
                 <div className="text-center py-4 sm:py-8 px-2">
                   <Bot className="w-12 h-12 sm:w-16 sm:h-16 text-primary-400 mx-auto mb-3 sm:mb-4" />

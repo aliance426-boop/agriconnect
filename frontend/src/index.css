@@ -214,45 +214,41 @@ nav {
   }
 }
 
-/* Classe spécifique pour le scroll du chatbot */
-.chatbot-scroll-area {
-  touch-action: pan-y !important;
-  overscroll-behavior-y: contain !important;
-  overscroll-behavior-x: none !important;
-  -webkit-overflow-scrolling: touch !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  position: relative;
-  z-index: 10;
-  will-change: scroll-position;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  /* Forcer le scroll sur mobile */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-/* Empêcher la propagation des événements touch sur les zones de scroll */
+/* Classe spécifique pour le scroll du chatbot - APPROCHE RADICALE */
+.chatbot-scroll-area,
 .chatbot-scroll-area * {
-  touch-action: pan-y !important;
-  pointer-events: auto;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
 }
 
-/* Media query spécifique pour mobile - forcer le scroll */
+/* Media query spécifique pour mobile - FORCER LE SCROLL */
 @media (max-width: 640px) {
-  .chatbot-scroll-area {
-    touch-action: pan-y !important;
-    -webkit-overflow-scrolling: touch !important;
-    overflow-y: scroll !important;
-    overscroll-behavior-y: auto !important;
-    position: relative !important;
-    height: 100% !important;
-    max-height: 100% !important;
+  /* Conteneur principal du chatbot - ne pas bloquer */
+  .chatbot-container {
+    touch-action: none !important;
+    overflow: visible !important;
   }
   
-  /* S'assurer que le parent ne bloque pas */
-  .chatbot-scroll-area {
-    isolation: isolate;
+  /* Zones de scroll - permettre uniquement le scroll vertical */
+  .chatbot-scroll-area,
+  div[style*="overflow-y-scroll"],
+  div[style*="overflow-y-auto"] {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    overscroll-behavior-x: none !important;
+    overflow-y: scroll !important;
+    position: relative !important;
+    will-change: scroll-position !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+  
+  /* Empêcher le body de scroller quand on scroll dans le chatbot */
+  body.chatbot-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
   }
 }
 
