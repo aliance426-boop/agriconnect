@@ -227,12 +227,33 @@ nav {
   will-change: scroll-position;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+  /* Forcer le scroll sur mobile */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Empêcher la propagation des événements touch sur les zones de scroll */
 .chatbot-scroll-area * {
   touch-action: pan-y !important;
   pointer-events: auto;
+}
+
+/* Media query spécifique pour mobile - forcer le scroll */
+@media (max-width: 640px) {
+  .chatbot-scroll-area {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important;
+    overscroll-behavior-y: auto !important;
+    position: relative !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+  
+  /* S'assurer que le parent ne bloque pas */
+  .chatbot-scroll-area {
+    isolation: isolate;
+  }
 }
 
 

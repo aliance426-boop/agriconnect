@@ -217,8 +217,24 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
 
   return (
     <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+      {/* Backdrop pour mobile */}
+      {showSidebar && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 sm:hidden"
+          onClick={() => setShowSidebar(false)}
+          style={{ touchAction: 'none' }}
+        />
+      )}
+      
       {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`}>
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col fixed sm:relative z-20 bg-white dark:bg-gray-800 h-full sm:h-auto shadow-lg sm:shadow-none`} style={{ 
+        top: 0,
+        left: 0,
+        right: 'auto',
+        bottom: 0,
+        height: '100vh',
+        maxHeight: '100vh'
+      }}>
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
@@ -243,7 +259,14 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide chatbot-scroll-area">
+        <div 
+          className="flex-1 overflow-y-auto scrollbar-hide chatbot-scroll-area"
+          style={{
+            minHeight: 0,
+            maxHeight: '100%',
+            height: '100%'
+          }}
+        >
           {conversations.length === 0 ? (
             <div className="p-4 text-center text-gray-500 dark:text-gray-400">
               <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
