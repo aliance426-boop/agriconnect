@@ -271,8 +271,11 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
           position: 'relative',
           height: '100%',
           maxHeight: '100%',
-          overflowY: 'scroll',
-          overflowX: 'hidden'
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          willChange: 'scroll-position',
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)'
         }}
       >
         {conversations.length === 0 ? (
@@ -345,9 +348,10 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             className="fixed top-0 left-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-800 shadow-xl z-[9999] flex flex-col"
             onClick={(e) => e.stopPropagation()}
             style={{
-              height: '100vh',
-              maxHeight: '100vh',
-              overflow: 'hidden'
+              height: '100dvh',
+              maxHeight: '100dvh',
+              overflow: 'hidden',
+              touchAction: 'pan-y'
             }}
           >
             {sidebarContent}
