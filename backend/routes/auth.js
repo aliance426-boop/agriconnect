@@ -54,7 +54,7 @@ router.post('/register', upload.single('profileImage'), optimizeUploadedImage, [
       location,
       role,
       companyName: role === 'MERCHANT' ? companyName : undefined,
-      profileImage: req.file ? req.file.filename : null
+      profileImage: req.file ? (req.file.cloudinaryUrl || req.file.path || req.file.filename) : null
     });
 
     await user.save();

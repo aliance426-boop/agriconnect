@@ -6,7 +6,12 @@
 export const getImageUrl = (filename) => {
   if (!filename) return null;
   
-  // Utiliser la variable d'environnement pour l'URL de l'API
+  // Si c'est déjà une URL complète (Cloudinary), la retourner telle quelle
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  
+  // Sinon, construire l'URL depuis le backend local
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   
   // Retirer /api de la fin si présent pour obtenir l'URL de base

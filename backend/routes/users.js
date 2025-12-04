@@ -128,16 +128,34 @@ router.post('/profile-image', auth, upload.single('profileImage'), optimizeUploa
 
     // Supprimer l'ancienne image si elle existe
     if (user.profileImage) {
-      const fs = require('fs');
-      const path = require('path');
-      const oldImagePath = path.join(__dirname, '../uploads', user.profileImage);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
+      const config = require('../config');
+      if (config.USE_CLOUDINARY && config.CLOUDINARY_CLOUD_NAME) {
+        // Supprimer de Cloudinary
+        const cloudinary = require('cloudinary').v2;
+        try {
+          // Extraire le public_id de l'URL Cloudinary
+          if (user.profileImage.startsWith('http')) {
+            const urlParts = user.profileImage.split('/');
+            const publicId = urlParts.slice(-2).join('/').replace(/\.[^/.]+$/, '');
+            await cloudinary.uploader.destroy(publicId);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la suppression de l\'image Cloudinary:', error);
+        }
+      } else {
+        // Supprimer du système de fichiers local
+        const fs = require('fs');
+        const path = require('path');
+        const oldImagePath = path.join(__dirname, '../uploads', user.profileImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
       }
     }
 
     // Mettre à jour la photo de profil
-    user.profileImage = req.file.filename;
+    // Si Cloudinary, utiliser l'URL complète, sinon le filename
+    user.profileImage = req.file.cloudinaryUrl || req.file.path || req.file.filename;
     await user.save();
 
     res.json({

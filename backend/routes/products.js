@@ -148,7 +148,8 @@ router.put('/:id', auth, requireRole(['PRODUCER']), upload.single('image'), opti
     product.description = description || product.description;
     
     if (req.file) {
-      product.image = req.file.filename;
+      // Si Cloudinary, utiliser l'URL complète, sinon le filename
+      product.image = req.file.cloudinaryUrl || req.file.path || req.file.filename;
     }
 
     await product.save();
