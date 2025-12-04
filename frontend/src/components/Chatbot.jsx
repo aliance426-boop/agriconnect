@@ -235,19 +235,21 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       {/* Backdrop pour mobile */}
       {showSidebar && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 sm:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[100] sm:hidden"
           onClick={() => setShowSidebar(false)}
+          style={{ touchAction: 'none' }}
         />
       )}
       
       {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col fixed sm:relative z-20 bg-white dark:bg-gray-800 h-full sm:h-auto shadow-lg sm:shadow-none`} style={{ 
-        top: 0,
-        left: 0,
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col fixed sm:relative z-[110] sm:z-auto bg-white dark:bg-gray-800 h-full sm:h-auto shadow-lg sm:shadow-none`} style={{ 
+        top: showSidebar ? 0 : 'auto',
+        left: showSidebar ? 0 : 'auto',
         right: 'auto',
         bottom: 0,
-        height: '100vh',
-        maxHeight: '100vh'
+        height: showSidebar ? '100vh' : 'auto',
+        maxHeight: showSidebar ? '100vh' : 'auto',
+        width: showSidebar ? '100%' : 'auto'
       }}>
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
