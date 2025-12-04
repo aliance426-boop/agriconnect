@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Upload, X, User } from 'lucide-react';
+import { Camera, X, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const RegisterProfileImage = ({ onImageChange, role }) => {
@@ -32,7 +32,8 @@ const RegisterProfileImage = ({ onImageChange, role }) => {
     }
   };
 
-  const handleRemove = () => {
+  const handleRemove = (e) => {
+    e.stopPropagation();
     setPreview(null);
     setSelectedFile(null);
     onImageChange(null);
@@ -40,50 +41,41 @@ const RegisterProfileImage = ({ onImageChange, role }) => {
     if (fileInput) fileInput.value = '';
   };
 
-  const getDefaultAvatar = () => {
-    switch (role) {
-      case 'PRODUCER':
-        return '/images/default-avatars/producer-default.svg';
-      case 'MERCHANT':
-        return '/images/default-avatars/merchant-default.svg';
-      default:
-        return '/images/default-avatars/producer-default.svg';
-    }
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <label className="label">Photo de profil (optionnel)</label>
       
-      <div className="flex items-center space-x-4">
-        {/* Photo de profil actuelle */}
-        <div className="relative">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+      {/* Zone de sélection d'image - style moderne */}
+      <div className="flex justify-center">
+        <label
+          htmlFor="register-profile-image-input"
+          className="relative cursor-pointer group"
+        >
+          <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 group-hover:border-primary-500 dark:group-hover:border-primary-400 transition-all duration-200 flex items-center justify-center">
             {preview ? (
-              <img
-                src={preview}
-                alt="Aperçu de la photo de profil"
-                className="w-full h-full object-cover"
-              />
+              <>
+                <img
+                  src={preview}
+                  alt="Photo de profil"
+                  className="w-full h-full object-cover"
+                />
+                {/* Bouton supprimer sur l'image */}
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="absolute top-0 right-0 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-colors"
+                  title="Supprimer la photo"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </>
             ) : (
-              <img
-                src={getDefaultAvatar()}
-                alt={`Avatar par défaut ${role === 'PRODUCER' ? 'Producteur' : 'Commerçant'}`}
-                className="w-full h-full object-cover"
-              />
+              <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors">
+                <Camera className="w-8 h-8 mb-1" />
+                <span className="text-xs font-medium">Ajouter</span>
+              </div>
             )}
           </div>
-        </div>
-
-        {/* Bouton d'upload */}
-        <div className="space-y-2">
-          <label
-            htmlFor="register-profile-image-input"
-            className="btn-outline cursor-pointer flex items-center space-x-2"
-          >
-            <Camera className="w-4 h-4" />
-            <span>Choisir une photo</span>
-          </label>
           
           <input
             id="register-profile-image-input"
@@ -92,29 +84,7 @@ const RegisterProfileImage = ({ onImageChange, role }) => {
             onChange={handleFileSelect}
             className="hidden"
           />
-          
-          {selectedFile && (
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="text-sm text-red-600 hover:text-red-700 flex items-center space-x-1"
-            >
-              <X className="w-4 h-4" />
-              <span>Supprimer</span>
-            </button>
-          )}
-          
-          <p className="text-xs text-gray-500">
-            JPG, PNG ou GIF (max 5MB)
-          </p>
-        </div>
-      </div>
-
-      {/* Message d'information */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-sm text-blue-800">
-          <strong>Conseil :</strong> Ajouter une photo de profil aide les autres utilisateurs à vous reconnaître et renforce la confiance dans vos échanges.
-        </p>
+        </label>
       </div>
     </div>
   );
