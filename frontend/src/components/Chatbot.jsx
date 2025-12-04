@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { MessageCircle, Send, Plus, Trash2, Bot, User, Menu, X } from 'lucide-react';
 import { chatbotService } from '../services/api';
 import toast from 'react-hot-toast';
@@ -230,27 +231,123 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
     };
   }, [showSidebar]);
 
+  // Sidebar content
+  const sidebarContent = (
+    <>
+      <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+            Conversations
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCreateConversation}
+              className="p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
+              title="Nouvelle conversation"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg sm:hidden transition-colors"
+              title="Fermer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div 
+        ref={conversationsScrollRef}
+        className="flex-1 overflow-y-scroll scrollbar-hide"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y',
+          minHeight: 0,
+          position: 'relative',
+          height: '100%'
+        }}
+      >
+        {conversations.length === 0 ? (
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+            <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+            <p className="text-sm sm:text-base">Aucune conversation</p>
+            <p className="text-xs sm:text-sm">Créez votre première conversation</p>
+          </div>
+        ) : (
+          <div className="space-y-1.5 p-2 sm:p-3">
+            {conversations.map((conversation) => (
+              <div
+                key={conversation._id}
+                onClick={() => {
+                  setSelectedConversation(conversation);
+                  setShowSidebar(false);
+                }}
+                className={`p-3 sm:p-3.5 rounded-lg cursor-pointer transition-colors ${
+                  selectedConversation?._id === conversation._id
+                    ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white truncate">
+                      {conversation.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                      {conversation.messages.length} message{conversation.messages.length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteConversation(conversation._id);
+                    }}
+                    className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <div className="chatbot-container h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative">
-      {/* Backdrop pour mobile */}
-      {showSidebar && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-[100] sm:hidden"
-          onClick={() => setShowSidebar(false)}
-          style={{ touchAction: 'none' }}
-        />
+      {/* Sidebar Desktop - toujours visible */}
+      <div className="hidden sm:flex w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col bg-white dark:bg-gray-800 h-full">
+        {sidebarContent}
+      </div>
+
+      {/* Sidebar Mobile - Portail React */}
+      {showSidebar && typeof document !== 'undefined' && createPortal(
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-[9998] sm:hidden"
+            onClick={() => setShowSidebar(false)}
+            style={{ touchAction: 'none' }}
+          />
+          
+          {/* Sidebar */}
+          <div 
+            className="fixed top-0 left-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-800 shadow-xl z-[9999] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              touchAction: 'none'
+            }}
+          >
+            {sidebarContent}
+          </div>
+        </>,
+        document.body
       )}
-      
-      {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col fixed sm:relative z-[110] sm:z-auto bg-white dark:bg-gray-800 h-full sm:h-auto shadow-lg sm:shadow-none`} style={{ 
-        top: showSidebar ? 0 : 'auto',
-        left: showSidebar ? 0 : 'auto',
-        right: 'auto',
-        bottom: 0,
-        height: showSidebar ? '100vh' : 'auto',
-        maxHeight: showSidebar ? '100vh' : 'auto',
-        width: showSidebar ? '100%' : 'auto'
-      }}>
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
