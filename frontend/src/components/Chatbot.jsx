@@ -216,9 +216,9 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
   };
 
   return (
-    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
+    <div className="h-[calc(100vh-280px)] sm:h-[600px] min-h-[400px] flex flex-col sm:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       {/* Sidebar - Conversations */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`} style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
+      <div className={`${showSidebar ? 'flex' : 'hidden'} sm:flex w-full sm:w-80 md:w-96 border-r border-gray-200 dark:border-gray-700 flex-col absolute sm:relative z-20 bg-white dark:bg-gray-800 h-full shadow-lg sm:shadow-none`} style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
@@ -243,7 +243,15 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div 
+          className="flex-1 overflow-y-auto scrollbar-hide"
+          style={{ 
+            touchAction: 'pan-y',
+            overscrollBehaviorY: 'contain',
+            overscrollBehaviorX: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
           {conversations.length === 0 ? (
             <div className="p-4 text-center text-gray-500 dark:text-gray-400">
               <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
@@ -251,7 +259,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
               <p className="text-xs sm:text-sm">Créez votre première conversation</p>
             </div>
           ) : (
-            <div className="space-y-1 p-2">
+            <div className="space-y-1.5 p-2 sm:p-3">
               {conversations.map((conversation) => (
                 <div
                   key={conversation._id}
@@ -259,7 +267,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                     setSelectedConversation(conversation);
                     setShowSidebar(false);
                   }}
-                  className={`p-2.5 sm:p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`p-3 sm:p-3.5 rounded-lg cursor-pointer transition-colors ${
                     selectedConversation?._id === conversation._id
                       ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
@@ -267,10 +275,10 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <h4 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white truncate">
                         {conversation.title}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                         {conversation.messages.length} message{conversation.messages.length > 1 ? 's' : ''}
                       </p>
                     </div>
@@ -279,9 +287,9 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
                         e.stopPropagation();
                         handleDeleteConversation(conversation._id);
                       }}
-                      className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors flex-shrink-0"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors flex-shrink-0"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 </div>
@@ -292,7 +300,7 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
         {selectedConversation ? (
           <>
             {/* Chat Header */}
@@ -315,7 +323,15 @@ const Chatbot = ({ conversations, onConversationUpdate }) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800">
+            <div 
+              className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-white dark:bg-gray-800"
+              style={{ 
+                touchAction: 'pan-y',
+                overscrollBehaviorY: 'contain',
+                overscrollBehaviorX: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
               {selectedConversation.messages.length === 0 ? (
                 <div className="text-center py-4 sm:py-8 px-2">
                   <Bot className="w-12 h-12 sm:w-16 sm:h-16 text-primary-400 mx-auto mb-3 sm:mb-4" />
